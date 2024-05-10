@@ -7,7 +7,7 @@ import { Clerk, ClerkProvider } from "@clerk/clerk-expo";
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-const publishableKey = "";
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
 export default function RootLayout() {
   const [loaded] = useFonts({
