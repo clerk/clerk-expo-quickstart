@@ -3,8 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
-    "reset-project": "./scripts/reset-project.js",
+    "start": "expo start",    
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
@@ -15,14 +14,15 @@
     "preset": "jest-expo"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "^1.0.7",
+    "@clerk/clerk-expo": "^1.2.0",
     "@expo/vector-icons": "^14.0.0",
     "@react-navigation/native": "^6.0.2",
-    "expo": "~51.0.1",
+    "expo": "^51.0.10",
     "expo-constants": "~16.0.1",
     "expo-font": "~12.0.4",
     "expo-linking": "~6.3.1",
-    "expo-router": "~3.5.11",
+    "expo-router": "^3.5.15",
+    "expo-secure-store": "^13.0.1",
     "expo-splash-screen": "~0.27.4",
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.4",

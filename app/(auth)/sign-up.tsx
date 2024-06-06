@@ -1,7 +1,6 @@
 import * as React from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { TextInput, Button, View } from "react-native";
 import { useSignUp } from "@clerk/clerk-expo";
-import { Link } from "expo-router";
 
 export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -13,7 +12,7 @@ export default function SignUpScreen() {
   const [pendingVerification, setPendingVerification] = React.useState(false);
   const [code, setCode] = React.useState("");
 
-  // start the sign up process.
+  // Start the sign up process.
   const onSignUpPress = async () => {
     if (!isLoaded) {
       return;
@@ -37,7 +36,7 @@ export default function SignUpScreen() {
     }
   };
 
-  // This verifies the user using email code that is delivered.
+  // Try to verify the user with the provided email code.
   const onPressVerify = async () => {
     if (!isLoaded) {
       return;
@@ -57,65 +56,48 @@ export default function SignUpScreen() {
   return (
     <View>
       {!pendingVerification && (
-        <View>
-          <View>
-            <Link href="/">
-              <Text>Home</Text>
-            </Link>
-          </View>
-          <View>
-            <TextInput
-              autoCapitalize="none"
-              value={firstName}
-              placeholder="First Name..."
-              onChangeText={(firstName) => setFirstName(firstName)}
-            />
-          </View>
-          <View>
-            <TextInput
-              autoCapitalize="none"
-              value={lastName}
-              placeholder="Last Name..."
-              onChangeText={(lastName) => setLastName(lastName)}
-            />
-          </View>
-          <View>
-            <TextInput
-              autoCapitalize="none"
-              value={emailAddress}
-              placeholder="Email..."
-              onChangeText={(email) => setEmailAddress(email)}
-            />
-          </View>
+        <>
+          <TextInput
+            autoCapitalize="none"
+            value={firstName}
+            placeholder="First Name..."
+            onChangeText={(firstName) => setFirstName(firstName)}
+          />
 
-          <View>
-            <TextInput
-              value={password}
-              placeholder="Password..."
-              placeholderTextColor="#000"
-              secureTextEntry={true}
-              onChangeText={(password) => setPassword(password)}
-            />
-          </View>
+          <TextInput
+            autoCapitalize="none"
+            value={lastName}
+            placeholder="Last Name..."
+            onChangeText={(lastName) => setLastName(lastName)}
+          />
 
-          <TouchableOpacity onPress={onSignUpPress}>
-            <Text>Sign up</Text>
-          </TouchableOpacity>
-        </View>
+          <TextInput
+            autoCapitalize="none"
+            value={emailAddress}
+            placeholder="Email..."
+            onChangeText={(email) => setEmailAddress(email)}
+          />
+
+          <TextInput
+            value={password}
+            placeholder="Password..."
+            secureTextEntry={true}
+            onChangeText={(password) => setPassword(password)}
+          />
+
+          <Button title="Sign Up" onPress={onSignUpPress} />
+        </>
       )}
       {pendingVerification && (
-        <View>
-          <View>
-            <TextInput
-              value={code}
-              placeholder="Code..."
-              onChangeText={(code) => setCode(code)}
-            />
-          </View>
-          <TouchableOpacity onPress={onPressVerify}>
-            <Text>Verify Email</Text>
-          </TouchableOpacity>
-        </View>
+        <>
+          <TextInput
+            value={code}
+            placeholder="Code..."
+            onChangeText={(code) => setCode(code)}
+          />
+
+          <Button title="Verify Email" onPress={onPressVerify} />
+        </>
       )}
     </View>
   );

@@ -5,7 +5,7 @@ export default function UnAuthenticatedLayout() {
   const { isSignedIn } = useAuth();
 
   if (isSignedIn) {
-    return <Redirect href={"/dashboard"} />;
+    return <Redirect href={"/"} />;
   }
 
   return <Stack />;

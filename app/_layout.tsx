@@ -1,8 +1,9 @@
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { Clerk, ClerkProvider } from "@clerk/clerk-expo";
+import { ClerkProvider } from "@clerk/clerk-expo";
+import { tokenCache } from "@/cache";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -24,9 +25,11 @@ export default function RootLayout() {
     return null;
   }
 
+  const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+
   return (
-    <ClerkProvider publishableKey={publishableKey}>
-      <Stack></Stack>
+    <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
+      <Slot />
     </ClerkProvider>
   );
 }
