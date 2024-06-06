@@ -1,50 +1,78 @@
-# Welcome to your Expo app 👋
+<p align="center">
+  <a href="https://clerk.com?utm_source=github&utm_medium=clerk_docs" target="_blank" rel="noopener noreferrer">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./assets/images/light-logo.png">
+      <img alt="Clerk Logo for light background" src="./assets/images/dark-logo.png" height="64">
+    </picture>
+  </a>
+  <br />
+</p>
+<div align="center">
+  <h1>
+    Clerk and Expo Quickstart 
+  </h1>  
+  <a href="https://www.npmjs.com/package/@clerk/clerk-js">
+    <img alt="Downloads" src="https://img.shields.io/npm/dm/@clerk/clerk-js" />
+  </a>
+  <a href="https://discord.com/invite/b5rXHjAg7A">
+    <img alt="Discord" src="https://img.shields.io/discord/856971667393609759?color=7389D8&label&logo=discord&logoColor=ffffff" />
+  </a>
+  <a href="https://twitter.com/clerkdev">
+    <img alt="Twitter" src="https://img.shields.io/twitter/url.svg?label=%40clerkdev&style=social&url=https%3A%2F%2Ftwitter.com%2Fclerkdev" />
+  </a> 
+  <br />
+  <br />
+  <img alt="Clerk Hero Image" src="./assets/images/hero.png">
+</div>
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Introduction
 
-## Get started
+Clerk is a developer-first authentication and user management solution. It provides pre-built React components and hooks for sign-in, sign-up, user profile, and organization management. Clerk is designed to be easy to use and customize, and can be dropped into any React or Next.js application.
 
-1. Install dependencies
+After following the quickstart you'll have learned how to:
 
-   ```bash
-   npm install
-   ```
+- Install `@clerk/clerk-expo`
+- Setup your environment key
+- Wrap your Expo app in `<ClerkProvider />` and supply your `tokenCache`
+- Conditionally show content based on your auth state
+- Build your sign-in and sign-up pages
 
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Running the template
 
 ```bash
-npm run reset-project
+git clone https://github.com/clerk/clerk-expo-quickstart
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+To run the example locally, you'll need to make sure you have XCode installed and configured properly, then:
+
+1. Sign up for a Clerk account at [https://clerk.com](https://dashboard.clerk.com/sign-up?utm_source=DevRel&utm_medium=docs&utm_campaign=templates&utm_content=10-24-2023&utm_term=clerk-expo-quickstart).
+
+2. Go to the [Clerk dashboard](https://dashboard.clerk.com?utm_source=DevRel&utm_medium=docs&utm_campaign=templates&utm_content=10-24-2023&utm_term=clerk-expo-quickstart) and create an application.
+
+3. Set the required Clerk environment variable as shown in [the example `env` file](./.env.example).
+
+4. `npm install` the required dependencies.
+
+5. `npm run start` to launch the development server.
 
 ## Learn more
 
-To learn more about developing your project with Expo, look at the following resources:
+To learn more about Clerk and Expo, check out the following resources:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- [Quickstart: Get started with Expo and Clerk](https://clerk.com/docs/quickstarts/expo?utm_source=DevRel&utm_medium=docs&utm_campaign=templates&utm_content=10-24-2023&utm_term=clerk-expo-quickstart)
 
-## Join the community
+- [Clerk Documentation](https://clerk.com/docs/references/expo/overview?utm_source=DevRel&utm_medium=docs&utm_campaign=templates&utm_content=10-24-2023&utm_term=clerk-expo-quickstart)
 
-Join our community of developers creating universal apps.
+- [Expo Documentation](https://docs.expo.dev/)
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Found an issue?
+
+If you have found an issue with the quickstart or have any questions, please visit our [Discord](https://clerk.com/discord) or reach out to our [Support team](mailto:support@clerk.dev).
+
+If it's a quick fix, such as a misspelled word or a broken link, go ahead and create a [pull request](https://github.com/clerk/clerk-expo-quickstart/pulls) with the solution. :rocket:
+
+## Connect with us
+
+You can discuss ideas, ask questions, and meet others from the community in our [Discord](https://clerk.com/discord).
+
+If you prefer, you can also find support through our [Twitter](https://twitter.com/ClerkDev), or you can [email](mailto:support@clerk.dev) us!
