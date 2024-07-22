@@ -65,14 +65,12 @@ To learn more about Clerk and Expo, check out the following resources:
 
 - [Expo Documentation](https://docs.expo.dev/)
 
-## Found an issue?
+## Found an issue or want to leave feedback
 
-If you have found an issue with the quickstart or have any questions, please visit our [Discord](https://clerk.com/discord) or reach out to our [Support team](mailto:support@clerk.dev).
-
-If it's a quick fix, such as a misspelled word or a broken link, go ahead and create a [pull request](https://github.com/clerk/clerk-expo-quickstart/pulls) with the solution. :rocket:
+Feel free to create a support thread on our [Discord](https://clerk.com/discord). Our support team will be happy to assist you in the `#support` channel.
 
 ## Connect with us
 
-You can discuss ideas, ask questions, and meet others from the community in our [Discord](https://clerk.com/discord).
+You can discuss ideas, ask questions, and meet others from the community in our [Discord](https://discord.com/invite/b5rXHjAg7A).
 
 If you prefer, you can also find support through our [Twitter](https://twitter.com/ClerkDev), or you can [email](mailto:support@clerk.dev) us!
