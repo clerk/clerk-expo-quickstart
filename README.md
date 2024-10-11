@@ -9,8 +9,8 @@
 </p>
 <div align="center">
   <h1>
-    Clerk and Expo Quickstart 
-  </h1>  
+    Clerk and Expo Quickstart
+  </h1>
   <a href="https://www.npmjs.com/package/@clerk/clerk-js">
     <img alt="Downloads" src="https://img.shields.io/npm/dm/@clerk/clerk-js" />
   </a>
@@ -19,7 +19,7 @@
   </a>
   <a href="https://twitter.com/clerkdev">
     <img alt="Twitter" src="https://img.shields.io/twitter/url.svg?label=%40clerkdev&style=social&url=https%3A%2F%2Ftwitter.com%2Fclerkdev" />
-  </a> 
+  </a>
   <br />
   <br />
   <img alt="Clerk Hero Image" src="./assets/images/hero.png">
@@ -36,6 +36,11 @@ After following the quickstart you'll have learned how to:
 - Wrap your Expo app in `<ClerkProvider />` and supply your `tokenCache`
 - Conditionally show content based on your auth state
 - Build your sign-in and sign-up pages
+
+### Branches of this repository
+
+- `main`: The result of following the [Clerk Expo quickstart](https://clerk.com/docs/quickstarts/expo).
+- `advanced`: A more advanced version of the quickstart, with OAuth connections, error handling and styling.
 
 ## Running the template
 
