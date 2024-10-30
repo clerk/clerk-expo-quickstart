@@ -14,12 +14,12 @@
     "preset": "jest-expo"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "^2.2.22",
-    "@expo/vector-icons": "^14.0.2",
-    "@react-navigation/native": "^6.0.2",
-    "expo": "~51.0.37",
+    "@clerk/clerk-expo": "^2.2.29",
+    "@expo/vector-icons": "^14.0.4",
+    "@react-navigation/native": "^6.1.18",
+    "expo": "~51.0.38",
     "expo-constants": "~16.0.2",
-    "expo-font": "~12.0.4",
+    "expo-font": "~12.0.10",
     "expo-linking": "~6.3.1",
     "expo-router": "~3.5.23",
     "expo-secure-store": "~13.0.2",
@@ -27,24 +27,24 @@
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.7",
     "expo-web-browser": "~13.0.3",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-native": "0.74.5",
-    "react-native-gesture-handler": "~2.16.1",
-    "react-native-reanimated": "~3.10.1",
-    "react-native-safe-area-context": "4.10.5",
-    "react-native-screens": "3.31.1",
-    "react-native-web": "~0.19.10"
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-native": "0.76.1",
+    "react-native-gesture-handler": "~2.20.2",
+    "react-native-reanimated": "~3.16.1",
+    "react-native-safe-area-context": "4.12.0",
+    "react-native-screens": "3.35.0",
+    "react-native-web": "~0.19.13"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0",
-    "@types/jest": "^29.5.12",
-    "@types/react": "~18.2.45",
-    "@types/react-test-renderer": "^18.0.7",
-    "jest": "^29.2.1",
+    "@babel/core": "^7.26.0",
+    "@types/jest": "^29.5.14",
+    "@types/react": "~18.3.12",
+    "@types/react-test-renderer": "^18.3.0",
+    "jest": "^29.7.0",
     "jest-expo": "~51.0.4",
-    "react-test-renderer": "18.2.0",
-    "typescript": "~5.3.3"
+    "react-test-renderer": "18.3.1",
+    "typescript": "~5.6.3"
   },
   "private": true
 }
