@@ -3,7 +3,7 @@ import { Slot } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
 import { ClerkProvider } from '@clerk/clerk-expo'
-import { tokenCache } from '@/cache'
+import { tokenCache } from '@clerk/clerk-expo/token-cache'
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync()
