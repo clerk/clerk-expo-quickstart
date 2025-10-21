@@ -29,10 +29,10 @@ import {
  *    - App ID Prefix (Team ID): From Apple Developer Console
  *
  * 4. Build Configuration:
- *    - For EAS Build: Configure eas.json (see APPLE_SIGNIN_SETUP.md)
+ *    - For EAS Build: Configure eas.json
  *    - For local build: Run `npx expo prebuild` and configure in Xcode
  *
- * For complete setup instructions, see: APPLE_SIGNIN_SETUP.md
+ * For complete setup instructions, see: /docs/expo/guides/configure/auth-strategies/sign-in-with-apple
  *
  * @param onSignInComplete - Optional callback called when sign-in completes successfully
  * @param showDivider - Whether to show "OR" divider below button (default: true)
