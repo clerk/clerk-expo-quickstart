@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Text, TextInput, TouchableOpacity, View, StyleSheet } from 'react-native'
 import { useSignUp } from '@clerk/clerk-expo'
 import { Link, useRouter } from 'expo-router'
-// import { AppleSignInButton } from '../components/AppleSignInButton'
+// import AppleSignInButton from '../components/AppleSignInButton'
 
 export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp()
@@ -89,7 +89,7 @@ export default function SignUpScreen() {
         OPTIONAL: Native Apple Sign-In (iOS only)
 
         To enable Apple Sign-In:
-        1. Uncomment the import at the top: import { AppleSignInButton } from '../components/AppleSignInButton'
+        1. Uncomment the import at the top: import AppleSignInButton from '../components/AppleSignInButton'
         2. Uncomment the <AppleSignInButton /> component below
         3. Follow the complete setup guide in APPLE_SIGNIN_SETUP.md
 

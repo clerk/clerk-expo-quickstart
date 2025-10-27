@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import React from "react";
-import { AppleSignInButton } from "../components/AppleSignInButton";
+import AppleSignInButton from "../components/AppleSignInButton";
 
 export default function Page() {
   const { signIn, setActive, isLoaded } = useSignIn();
@@ -53,7 +53,7 @@ export default function Page() {
         OPTIONAL: Native Apple Sign-In (iOS only)
 
         To enable Apple Sign-In:
-        1. Uncomment the import at the top: import { AppleSignInButton } from '../components/AppleSignInButton'
+        1. Uncomment the import at the top: import AppleSignInButton from '../components/AppleSignInButton'
         2. Uncomment the <AppleSignInButton /> component below
         3. Follow the complete setup guide in APPLE_SIGNIN_SETUP.md
 
@@ -62,7 +62,7 @@ export default function Page() {
         - Clerk Dashboard
         - EAS Build or Xcode signing
       */}
-      {/* <AppleSignInButton /> */}
+      <AppleSignInButton />
 
       <TextInput
         style={styles.input}

@@ -1,4 +1,4 @@
-import { useAppleSignIn } from "@clerk/clerk-expo";
+import { useAppleAuthentication } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import {
   Alert,
@@ -43,11 +43,11 @@ interface AppleSignInButtonProps {
   showDivider?: boolean;
 }
 
-export function AppleSignInButton({
+export default function AppleSignInButton({
   onSignInComplete,
   showDivider = true,
 }: AppleSignInButtonProps) {
-  const { startAppleSignInFlow } = useAppleSignIn();
+  const { startAppleAuthenticationFlow } = useAppleAuthentication();
   const router = useRouter();
 
   // Only render on iOS
@@ -57,7 +57,8 @@ export function AppleSignInButton({
 
   const handleAppleSignIn = async () => {
     try {
-      const { createdSessionId, setActive } = await startAppleSignInFlow();
+      const { createdSessionId, setActive } =
+        await startAppleAuthenticationFlow();
 
       if (createdSessionId && setActive) {
         await setActive({ session: createdSessionId });
