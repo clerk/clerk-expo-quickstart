@@ -1,4 +1,4 @@
-import { useAppleAuthentication } from "@clerk/clerk-expo";
+import { useSignInWithApple } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import {
   Alert,
@@ -47,7 +47,7 @@ export default function AppleSignInButton({
   onSignInComplete,
   showDivider = true,
 }: AppleSignInButtonProps) {
-  const { startAppleAuthenticationFlow } = useAppleAuthentication();
+  const { startAppleAuthenticationFlow } = useSignInWithApple();
   const router = useRouter();
 
   // Only render on iOS
