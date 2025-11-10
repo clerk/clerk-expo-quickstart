@@ -10,8 +10,9 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "^2.17.0",
+    "@clerk/clerk-expo": "^2.18.0",
     "@expo/vector-icons": "^15.0.2",
+    "@react-native-google-signin/google-signin": "^16.0.0",
     "@react-navigation/native": "^7.0.0",
     "base-64": "^1.0.0",
     "dequal": "^2.0.3",

@@ -3,6 +3,7 @@ import { Text, TextInput, TouchableOpacity, View, StyleSheet } from 'react-nativ
 import { useSignUp } from '@clerk/clerk-expo'
 import { Link, useRouter } from 'expo-router'
 // import AppleSignInButton from '../components/AppleSignInButton'
+// import GoogleSignInButton from '../components/GoogleSignInButton'
 
 export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp()
@@ -99,6 +100,21 @@ export default function SignUpScreen() {
         - EAS Build or Xcode signing
       */}
       {/* <AppleSignInButton /> */}
+
+      {/*
+        OPTIONAL: Native Google Sign-In (iOS and Android)
+
+        To enable Google Sign-In:
+        1. Uncomment the import at the top: import GoogleSignInButton from '../components/GoogleSignInButton'
+        2. Uncomment the <GoogleSignInButton /> component below
+        3. Follow the complete setup guide in GOOGLE_SIGNIN_SETUP.md
+
+        Note: Requires Google Cloud Console configuration and native build:
+        - Google Cloud Console OAuth credentials
+        - Clerk Dashboard SSO connection
+        - EAS Build or local prebuild
+      */}
+      {/* <GoogleSignInButton /> */}
 
       <TextInput
         style={styles.input}

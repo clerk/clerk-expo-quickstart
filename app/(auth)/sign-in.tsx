@@ -8,7 +8,8 @@ import {
   StyleSheet,
 } from "react-native";
 import React from "react";
-import AppleSignInButton from "../components/AppleSignInButton";
+// import AppleSignInButton from "../components/AppleSignInButton";
+// import GoogleSignInButton from "../components/GoogleSignInButton";
 
 export default function Page() {
   const { signIn, setActive, isLoaded } = useSignIn();
@@ -62,7 +63,22 @@ export default function Page() {
         - Clerk Dashboard
         - EAS Build or Xcode signing
       */}
-      <AppleSignInButton />
+      {/* <AppleSignInButton /> */}
+
+      {/*
+        OPTIONAL: Native Google Sign-In (iOS and Android)
+
+        To enable Google Sign-In:
+        1. Uncomment the import at the top: import GoogleSignInButton from '../components/GoogleSignInButton'
+        2. Uncomment the <GoogleSignInButton /> component below
+        3. Follow the complete setup guide in GOOGLE_SIGNIN_SETUP.md
+
+        Note: Requires Google Cloud Console configuration and native build:
+        - Google Cloud Console OAuth credentials
+        - Clerk Dashboard SSO connection
+        - EAS Build or local prebuild
+      */}
+      {/* <GoogleSignInButton /> */}
 
       <TextInput
         style={styles.input}
