@@ -42,6 +42,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-secure-store",
     "expo-font",
     "expo-apple-authentication",
+    [
+      "@react-native-google-signin/google-signin",
+      {
+        iosClientId: process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID,
+        iosUrlScheme: process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME,
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,
@@ -53,5 +60,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         projectId: process.env.EAS_PROJECT_ID,
       },
     }),
+    EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID: process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID,
+    EXPO_PUBLIC_CLERK_GOOGLE_ANDROID_CLIENT_ID: process.env.EXPO_PUBLIC_CLERK_GOOGLE_ANDROID_CLIENT_ID,
+    EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID: process.env.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID,
   },
 });
