@@ -1,9 +1,12 @@
 {
   "cli": {
-    "version": ">= 13.2.0"
+    "version": ">= 13.2.0",
+    "appVersionSource": "remote"
   },
   "build": {
+    "base": {},
     "development": {
+      "extends": "base",
       "developmentClient": true,
       "distribution": "internal",
       "ios": {
@@ -11,19 +14,28 @@
       }
     },
     "development-device": {
+      "extends": "base",
       "developmentClient": true,
       "distribution": "internal",
       "ios": {
-        "simulator": false
+        "simulator": false,
+        "enterpriseProvisioning": "adhoc"
+      },
+      "android": {
+        "buildType": "apk",
+        "credentialsSource": "local"
       }
     },
     "preview": {
+      "extends": "base",
       "distribution": "internal",
+      "developmentClient": false,
       "ios": {
         "simulator": false
       }
     },
     "production": {
+      "extends": "base",
       "autoIncrement": true
     }
   },

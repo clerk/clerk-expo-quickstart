@@ -7,7 +7,9 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
+import { useState } from "react";
 
 /**
  * GoogleSignInButton Component
@@ -20,8 +22,6 @@ import {
  *    - Create OAuth 2.0 credentials for iOS and Android
  *    - Add SHA-1 certificate fingerprints for Android
  *    - Configure iOS URL scheme
- *
- *   TODO: ADD FIREBASE INSTRUCTIONS HERE. TEST SETUP AS USER WOULD BUT USING FIREBASE INSTEAD OF JUST GOOGLE CLOUD. IS GOOGLE CLOUD REQUIRED DURING FIREBASE SETUP? LETS FIND OUT.
  *
  * 2. Configure Clerk Dashboard:
  *    - Enable Google as an SSO connection: https://dashboard.clerk.com/last-active?path=user-authentication/sso-connections
@@ -39,9 +39,6 @@ import {
  *    - For EAS Build: Configure eas.json
  *    - For local build: Run `npx expo prebuild`
  *
- * For complete setup instructions, see:
- * TODO: INSERT DOCUMENT GUIDE LINK HERE
- *
  * @param onSignInComplete - Optional callback called when sign-in completes successfully
  * @param showDivider - Whether to show "OR" divider below button (default: true)
  */
@@ -57,6 +54,7 @@ export default function GoogleSignInButton({
 }: GoogleSignInButtonProps) {
   const { startGoogleAuthenticationFlow } = useSignInWithGoogle();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   // Only render on iOS and Android
   if (Platform.OS !== "ios" && Platform.OS !== "android") {
@@ -64,6 +62,8 @@ export default function GoogleSignInButton({
   }
 
   const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+
     try {
       const { createdSessionId, setActive } =
         await startGoogleAuthenticationFlow();
@@ -71,36 +71,42 @@ export default function GoogleSignInButton({
       if (createdSessionId && setActive) {
         await setActive({ session: createdSessionId });
 
-        // Call optional callback
         if (onSignInComplete) {
           onSignInComplete();
         } else {
-          // Default behavior: navigate to home
           router.replace("/");
         }
       }
     } catch (err: any) {
-      // Handle specific Google Sign-In errors
+      // Handle user cancellation
       if (err.code === "SIGN_IN_CANCELLED" || err.code === "-5") {
-        // User canceled the sign-in flow - this is expected, don't show error
         return;
       }
 
       Alert.alert(
-        "Error",
+        "Google Sign-In Error",
         err.message || "An error occurred during Google Sign-In"
       );
-      console.error("Google Sign-In error:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <>
       <TouchableOpacity
-        style={styles.googleButton}
+        style={[styles.googleButton, isLoading && styles.googleButtonDisabled]}
         onPress={handleGoogleSignIn}
+        disabled={isLoading}
       >
-        <Text style={styles.googleButtonText}>Sign in with Google</Text>
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator color="#fff" />
+            <Text style={styles.googleButtonText}> Signing in...</Text>
+          </View>
+        ) : (
+          <Text style={styles.googleButtonText}>Sign in with Google</Text>
+        )}
       </TouchableOpacity>
 
       {showDivider && (
@@ -122,10 +128,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
+  googleButtonDisabled: {
+    backgroundColor: "#93B8F4",
+    opacity: 0.7,
+  },
   googleButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
+  },
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   divider: {
     flexDirection: "row",

@@ -39,6 +39,7 @@ After following the quickstart you'll have learned how to:
 - Conditionally show content based on your auth state
 - Build your sign-in and sign-up pages
 - **(Optional)** Enable native Apple Sign-In on iOS
+- **(Optional)** Enable native Google Sign-In on iOS and Android
 
 ## Quick Start
 
@@ -122,16 +123,33 @@ Native Apple Sign-In is **disabled by default** and requires additional setup:
 
 **To enable:**
 
-1. Follow the complete setup guide: TODO: link docs here.
+1. Follow the complete setup guide in [APPLE_SIGNIN_SETUP.md](./APPLE_SIGNIN_SETUP.md)
 
 2. Uncomment the Apple Sign-In button in:
-
    - `app/(auth)/sign-in.tsx`
    - `app/(auth)/sign-up.tsx`
 
 3. Build with EAS or local prebuild (Apple Sign-In doesn't work in Expo Go)
 
-For detailed instructions, see [APPLE_SIGNIN_SETUP.md](./APPLE_SIGNIN_SETUP.md).
+### 🔵 Optional: Native Google Sign-In (iOS & Android)
+
+Native Google Sign-In is **disabled by default** and requires additional setup:
+
+**Requirements:**
+
+- Google Cloud Console account (free)
+- Native build (EAS Build or local prebuild)
+- Configuration in Google Cloud Console and Clerk Dashboard
+
+**To enable:**
+
+1. Follow the complete setup guide in [GOOGLE_SIGNIN_SETUP.md](./GOOGLE_SIGNIN_SETUP.md)
+
+2. Uncomment the Google Sign-In button in:
+   - `app/(auth)/sign-in.tsx`
+   - `app/(auth)/sign-up.tsx`
+
+3. Build with EAS or local prebuild (Google Sign-In doesn't work in Expo Go)
 
 ## Building for Production
 
@@ -192,16 +210,18 @@ npx expo run:android --variant release
 ```
 ├── app/
 │   ├── (auth)/
-│   │   ├── sign-in.tsx          # Sign-in screen
-│   │   └── sign-up.tsx          # Sign-up screen
+│   │   ├── sign-in.tsx             # Sign-in screen
+│   │   └── sign-up.tsx             # Sign-up screen
 │   ├── (home)/
-│   │   └── index.tsx            # Home screen (protected)
+│   │   └── index.tsx               # Home screen (protected)
 │   ├── components/
-│   │   └── AppleSignInButton.tsx # Optional Apple Sign-In component
-│   └── _layout.tsx              # Root layout with ClerkProvider
-├── .env.example                 # Environment variables template
-├── eas.json                     # EAS Build configuration
-└── APPLE_SIGNIN_SETUP.md       # Apple Sign-In setup guide
+│   │   ├── AppleSignInButton.tsx   # Optional Apple Sign-In component
+│   │   └── GoogleSignInButton.tsx  # Optional Google Sign-In component
+│   └── _layout.tsx                 # Root layout with ClerkProvider
+├── .env.example                    # Environment variables template
+├── eas.json                        # EAS Build configuration
+├── APPLE_SIGNIN_SETUP.md          # Apple Sign-In setup guide
+└── GOOGLE_SIGNIN_SETUP.md         # Google Sign-In setup guide
 ```
 
 ## Environment Variables
