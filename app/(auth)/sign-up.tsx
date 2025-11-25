@@ -9,7 +9,7 @@ import {
 import { useSignUp } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
 // import AppleSignInButton from '../components/AppleSignInButton'
-import GoogleSignInButton from "../components/GoogleSignInButton";
+// import GoogleSignInButton from "../components/GoogleSignInButton";
 
 export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -120,7 +120,7 @@ export default function SignUpScreen() {
         - Clerk Dashboard SSO connection
         - EAS Build or local prebuild
       */}
-      <GoogleSignInButton />
+      {/* <GoogleSignInButton /> */}
 
       <TextInput
         style={styles.input}
