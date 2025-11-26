@@ -8,7 +8,8 @@ import {
   StyleSheet,
 } from "react-native";
 import React from "react";
-import AppleSignInButton from "../components/AppleSignInButton";
+// import AppleSignInButton from "../components/AppleSignInButton";
+// import GoogleSignInButton from "../components/GoogleSignInButton";
 
 export default function Page() {
   const { signIn, setActive, isLoaded } = useSignIn();
@@ -55,14 +56,30 @@ export default function Page() {
         To enable Apple Sign-In:
         1. Uncomment the import at the top: import AppleSignInButton from '../components/AppleSignInButton'
         2. Uncomment the <AppleSignInButton /> component below
-        3. Follow the complete setup guide in APPLE_SIGNIN_SETUP.md
+        3. Follow the setup guide: https://clerk.com/docs/guides/configure/auth-strategies/sign-in-with-apple
 
         Note: Requires Apple Developer Account and additional configuration in:
         - Apple Developer Console
         - Clerk Dashboard
         - EAS Build or Xcode signing
       */}
-      <AppleSignInButton />
+      {/* <AppleSignInButton /> */}
+
+      {/*
+        OPTIONAL: Native Google Sign-In (iOS and Android)
+
+        To enable Google Sign-In:
+        1. Uncomment the import at the top: import GoogleSignInButton from '../components/GoogleSignInButton'
+        2. Uncomment the <GoogleSignInButton /> component below
+        3. Follow the setup guide: https://clerk.com/docs/guides/configure/auth-strategies/sign-in-with-google
+
+        Note: Requires Google Cloud Console setup and additional configuration in:
+        - Google Cloud Console (OAuth credentials)
+        - Clerk Dashboard
+        - Environment variables (EXPO_PUBLIC_CLERK_GOOGLE_*)
+        - iOS: @clerk/clerk-expo plugin in app.config.ts
+      */}
+      {/* <GoogleSignInButton /> */}
 
       <TextInput
         style={styles.input}

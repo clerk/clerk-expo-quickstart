@@ -25,3 +25,15 @@ ios/
 
 # android
 android/
+
+# yalc
+.yalc
+yalc.lock
+
+# metro
+metro.config.js
+
+# artifacts
+*.ipa
+*.apk
+*.aab
