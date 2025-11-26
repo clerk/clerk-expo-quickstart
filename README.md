@@ -123,33 +123,14 @@ Native Apple Sign-In is **disabled by default** and requires additional setup:
 
 **To enable:**
 
-1. Follow the complete setup guide in [APPLE_SIGNIN_SETUP.md](./APPLE_SIGNIN_SETUP.md)
+1. Follow the [Sign in with Apple setup guide](https://clerk.com/docs/guides/configure/auth-strategies/sign-in-with-apple).
 
 2. Uncomment the Apple Sign-In button in:
+
    - `app/(auth)/sign-in.tsx`
    - `app/(auth)/sign-up.tsx`
 
 3. Build with EAS or local prebuild (Apple Sign-In doesn't work in Expo Go)
-
-### 🔵 Optional: Native Google Sign-In (iOS & Android)
-
-Native Google Sign-In is **disabled by default** and requires additional setup:
-
-**Requirements:**
-
-- Google Cloud Console account (free)
-- Native build (EAS Build or local prebuild)
-- Configuration in Google Cloud Console and Clerk Dashboard
-
-**To enable:**
-
-1. Follow the complete setup guide in [GOOGLE_SIGNIN_SETUP.md](./GOOGLE_SIGNIN_SETUP.md)
-
-2. Uncomment the Google Sign-In button in:
-   - `app/(auth)/sign-in.tsx`
-   - `app/(auth)/sign-up.tsx`
-
-3. Build with EAS or local prebuild (Google Sign-In doesn't work in Expo Go)
 
 ## Building for Production
 
@@ -215,13 +196,10 @@ npx expo run:android --variant release
 │   ├── (home)/
 │   │   └── index.tsx               # Home screen (protected)
 │   ├── components/
-│   │   ├── AppleSignInButton.tsx   # Optional Apple Sign-In component
-│   │   └── GoogleSignInButton.tsx  # Optional Google Sign-In component
-│   └── _layout.tsx                 # Root layout with ClerkProvider
-├── .env.example                    # Environment variables template
-├── eas.json                        # EAS Build configuration
-├── APPLE_SIGNIN_SETUP.md          # Apple Sign-In setup guide
-└── GOOGLE_SIGNIN_SETUP.md         # Google Sign-In setup guide
+│   │   └── AppleSignInButton.tsx # Optional Apple Sign-In component
+│   └── _layout.tsx              # Root layout with ClerkProvider
+├── .env.example                 # Environment variables template
+└── eas.json                     # EAS Build configuration
 ```
 
 ## Environment Variables
@@ -261,7 +239,7 @@ To learn more about Clerk and Expo, check out the following resources:
 
 ### Apple Sign-In not working
 
-- Verify you've followed all steps in [APPLE_SIGNIN_SETUP.md](./APPLE_SIGNIN_SETUP.md)
+- Verify you've followed all steps in the [Sign in with Apple setup guide](https://clerk.com/docs/guides/configure/auth-strategies/sign-in-with-apple)
 - Apple Sign-In requires a native build (doesn't work in Expo Go)
 - Check that the capability is enabled in your Apple Developer account
 
