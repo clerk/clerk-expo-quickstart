@@ -10,7 +10,7 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "file:../javascript/packages/expo",
+    "@clerk/clerk-expo": "link:../javascript/packages/expo",
     "@expo/vector-icons": "^15.0.2",
     "@react-native-community/netinfo": "^11.4.1",
     "@react-navigation/native": "^7.0.0",
