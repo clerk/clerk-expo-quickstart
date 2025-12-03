@@ -1,37 +1,83 @@
-import { useFonts } from 'expo-font'
-import { Slot } from 'expo-router'
-import * as SplashScreen from 'expo-splash-screen'
-import { useEffect } from 'react'
-import { ClerkProvider } from '@clerk/clerk-expo'
-import { tokenCache } from '@clerk/clerk-expo/token-cache'
+import { useFonts } from "expo-font";
+import { Slot } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
+import { Platform } from "react-native";
+import { ClerkProvider, ClerkLoaded, useClerk } from "@clerk/clerk-expo";
+import { tokenCache } from "@clerk/clerk-expo/token-cache";
+import { requireNativeModule } from "expo-modules-core";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync()
+SplashScreen.preventAutoHideAsync();
+
+// Get the native module
+const ClerkExpo =
+  Platform.OS === "ios" ? requireNativeModule("ClerkExpo") : null;
+
+// Component to sync native session to JS on startup
+function NativeSessionSync() {
+  const { setActive } = useClerk();
+
+  useEffect(() => {
+    const syncNativeSession = async () => {
+      if (!ClerkExpo?.getSession) {
+        return;
+      }
+
+      try {
+        console.log("[NativeSessionSync] Checking for native session...");
+        const nativeSession = await ClerkExpo.getSession();
+
+        if (nativeSession?.sessionId) {
+          console.log(
+            "[NativeSessionSync] Found native session, syncing to JS:",
+            nativeSession.sessionId
+          );
+          await setActive({ session: nativeSession.sessionId });
+          console.log("[NativeSessionSync] Session synced successfully");
+        } else {
+          console.log("[NativeSessionSync] No native session found");
+        }
+      } catch (err) {
+        console.log("[NativeSessionSync] Error syncing session:", err);
+      }
+    };
+
+    syncNativeSession();
+  }, [setActive]);
+
+  return null;
+}
 
 export default function RootLayout() {
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  })
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+  });
 
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync()
+      SplashScreen.hideAsync();
     }
-  }, [loaded])
+  }, [loaded]);
 
   if (!loaded) {
-    return null
+    return null;
   }
 
-  const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!
+  const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
   if (!publishableKey) {
-    throw new Error('Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env')
+    throw new Error(
+      "Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env"
+    );
   }
 
   return (
     <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
-      <Slot />
+      <ClerkLoaded>
+        <NativeSessionSync />
+        <Slot />
+      </ClerkLoaded>
     </ClerkProvider>
-  )
+  );
 }
