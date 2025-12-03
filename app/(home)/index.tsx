@@ -1,4 +1,3 @@
-import { useUser, useClerk } from "@clerk/clerk-expo";
 import { UserButton } from "@clerk/clerk-expo/native";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
@@ -18,12 +17,26 @@ import { requireNativeModule } from "expo-modules-core";
 const ClerkExpo =
   Platform.OS === "ios" ? requireNativeModule("ClerkExpo") : null;
 
+// Types for native session data
+interface NativeUser {
+  id: string;
+  firstName?: string;
+  lastName?: string;
+  imageUrl?: string;
+  primaryEmailAddress?: string;
+}
+
+interface NativeSession {
+  sessionId: string;
+  status: string;
+  user?: NativeUser;
+}
+
 // Custom hook to check native session state
 function useNativeSession() {
-  const [nativeSession, setNativeSession] = useState<{
-    sessionId: string;
-    status: string;
-  } | null>(null);
+  const [nativeSession, setNativeSession] = useState<NativeSession | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   const checkSession = async () => {
@@ -34,6 +47,7 @@ function useNativeSession() {
 
     try {
       const session = await ClerkExpo.getSession();
+      console.log("[useNativeSession] Session data:", JSON.stringify(session));
       setNativeSession(session);
     } catch (err) {
       console.log("[useNativeSession] Error:", err);
@@ -51,8 +65,8 @@ function useNativeSession() {
 }
 
 export default function Page() {
-  const { user } = useUser();
   const { nativeSession, isLoading, refresh } = useNativeSession();
+  const nativeUser = nativeSession?.user;
 
   const isSignedIn = !!nativeSession?.sessionId;
 
@@ -140,15 +154,15 @@ export default function Page() {
 
         {/* User Profile Card */}
         <View style={styles.profileCard}>
-          {user?.imageUrl && (
-            <Image source={{ uri: user.imageUrl }} style={styles.avatar} />
+          {nativeUser?.imageUrl && (
+            <Image source={{ uri: nativeUser.imageUrl }} style={styles.avatar} />
           )}
           <View style={styles.userInfo}>
             <Text style={styles.userName}>
-              {user?.firstName || "User"} {user?.lastName || ""}
+              {nativeUser?.firstName || "User"} {nativeUser?.lastName || ""}
             </Text>
             <Text style={styles.userEmail}>
-              {user?.emailAddresses?.[0]?.emailAddress || "Signed In"}
+              {nativeUser?.primaryEmailAddress || "Signed In"}
             </Text>
           </View>
         </View>
