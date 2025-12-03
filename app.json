@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.clerk-expo-quickstart"
     },
     "android": {
       "adaptiveIcon": {
@@ -27,11 +28,23 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "@clerk/clerk-expo/app.plugin",
       "expo-router",
       "expo-secure-store",
       "expo-font",
-      "expo-apple-authentication",
-      "@clerk/clerk-expo"
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0"
+          },
+          "ios": {
+            "deploymentTarget": "17.0"
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

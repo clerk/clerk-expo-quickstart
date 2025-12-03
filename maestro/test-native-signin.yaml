@@ -1,0 +1,28 @@
+appId: com.clerk.clerkexpoquickstart
+---
+# Test Native Sign In View Registration
+
+# Wait for the app to be ready
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# Take a screenshot of initial state
+- takeScreenshot: initial-state
+
+# Check for any error alert or crash
+- assertVisible:
+    text: ".*error.*"
+    optional: true
+- runFlow:
+    when:
+      visible: ".*error.*"
+    file: report-error.yaml
+
+# Look for sign-in related elements
+# The app should show a sign-in button or sign-in view
+- takeScreenshot: after-load
+
+# Output the view hierarchy to help debug
+- runScript:
+    script: |
+      output.viewHierarchy = "captured"

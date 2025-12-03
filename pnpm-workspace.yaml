@@ -1,0 +1,2 @@
+overrides:
+  '@clerk/clerk-expo': link:../javascript/packages/expo
