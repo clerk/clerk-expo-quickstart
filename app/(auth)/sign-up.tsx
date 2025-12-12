@@ -1,10 +1,9 @@
 import * as React from 'react'
-import { Text, TextInput, TouchableOpacity, View, StyleSheet } from 'react-native'
+import { Text, TextInput, Button, View } from 'react-native'
 import { useSignUp } from '@clerk/clerk-expo'
 import { Link, useRouter } from 'expo-router'
-// import AppleSignInButton from '../components/AppleSignInButton'
 
-export default function SignUpScreen() {
+export default function Page() {
   const { isLoaded, signUp, setActive } = useSignUp()
   const router = useRouter()
 
@@ -28,10 +27,10 @@ export default function SignUpScreen() {
       await signUp.prepareEmailAddressVerification({ strategy: 'email_code' })
 
       // Set 'pendingVerification' to true to display second form
-      // and capture OTP code
+      // and capture code
       setPendingVerification(true)
     } catch (err) {
-      // See https://clerk.com/docs/custom-flows/error-handling
+      // See https://clerk.com/docs/guides/development/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2))
     }
@@ -50,7 +49,20 @@ export default function SignUpScreen() {
       // If verification was completed, set the session to active
       // and redirect the user
       if (signUpAttempt.status === 'complete') {
-        await setActive({ session: signUpAttempt.createdSessionId })
+        await setActive({
+          session: signUpAttempt.createdSessionId,
+          navigate: async ({ session }) => {
+            if (session?.currentTask) {
+              // Check for tasks and navigate to custom UI to help users resolve them
+              // See https://clerk.com/docs/guides/development/custom-flows/overview#session-tasks
+              console.log(session?.currentTask)
+              return
+            }
+
+            router.replace('/')
+          },
+        })
+
         router.replace('/')
       } else {
         // If the status is not complete, check why. User may need to
@@ -58,7 +70,7 @@ export default function SignUpScreen() {
         console.error(JSON.stringify(signUpAttempt, null, 2))
       }
     } catch (err) {
-      // See https://clerk.com/docs/custom-flows/error-handling
+      // See https://clerk.com/docs/guides/development/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2))
     }
@@ -66,107 +78,45 @@ export default function SignUpScreen() {
 
   if (pendingVerification) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Verify your email</Text>
+      <>
+        <Text>Verify your email</Text>
         <TextInput
-          style={styles.input}
           value={code}
           placeholder="Enter your verification code"
+          placeholderTextColor="#666666"
           onChangeText={(code) => setCode(code)}
         />
-        <TouchableOpacity style={styles.button} onPress={onVerifyPress}>
-          <Text style={styles.buttonText}>Verify</Text>
-        </TouchableOpacity>
-      </View>
+        <Button title="Verify" onPress={onVerifyPress} />
+      </>
     )
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign up</Text>
-
-      {/*
-        OPTIONAL: Native Apple Sign-In (iOS only)
-
-        To enable Apple Sign-In:
-        1. Uncomment the import at the top: import AppleSignInButton from '../components/AppleSignInButton'
-        2. Uncomment the <AppleSignInButton /> component below
-        3. Follow the complete setup guide in APPLE_SIGNIN_SETUP.md
-
-        Note: Requires Apple Developer Account and additional configuration in:
-        - Apple Developer Console
-        - Clerk Dashboard
-        - EAS Build or Xcode signing
-      */}
-      {/* <AppleSignInButton /> */}
-
-      <TextInput
-        style={styles.input}
-        autoCapitalize="none"
-        value={emailAddress}
-        placeholder="Enter email"
-        onChangeText={(email) => setEmailAddress(email)}
-      />
-      <TextInput
-        style={styles.input}
-        value={password}
-        placeholder="Enter password"
-        secureTextEntry={true}
-        onChangeText={(password) => setPassword(password)}
-      />
-      <TouchableOpacity style={styles.button} onPress={onSignUpPress}>
-        <Text style={styles.buttonText}>Continue</Text>
-      </TouchableOpacity>
-      <View style={styles.footer}>
-        <Text>Already have an account?</Text>
-        <Link href="/sign-in">
-          <Text style={styles.link}>Sign in</Text>
-        </Link>
-      </View>
+    <View>
+      <>
+        <Text>Sign up</Text>
+        <TextInput
+          autoCapitalize="none"
+          value={emailAddress}
+          placeholder="Enter email"
+          placeholderTextColor="#666666"
+          onChangeText={(email) => setEmailAddress(email)}
+        />
+        <TextInput
+          value={password}
+          placeholder="Enter password"
+          placeholderTextColor="#666666"
+          secureTextEntry={true}
+          onChangeText={(password) => setPassword(password)}
+        />
+        <Button title="Continue" onPress={onSignUpPress} />
+        <View style={{ flexDirection: 'row', gap: 4 }}>
+          <Text>Have an account?</Text>
+          <Link href="/sign-in">
+            <Text>Sign in</Text>
+          </Link>
+        </View>
+      </>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 20,
-    gap: 5,
-  },
-  link: {
-    color: '#007AFF',
-    fontWeight: '600',
-  },
-})
