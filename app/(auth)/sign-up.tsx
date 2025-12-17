@@ -6,7 +6,7 @@ import {
   View,
   StyleSheet,
 } from "react-native";
-import { useSignUp } from "@clerk/clerk-expo";
+import { useSignUp } from "@clerk/expo";
 import { Link, useRouter } from "expo-router";
 // import AppleSignInButton from '../components/AppleSignInButton'
 // import GoogleSignInButton from '../components/GoogleSignInButton'

@@ -19,7 +19,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supportsTablet: true,
     bundleIdentifier:
       process.env.EXPO_PUBLIC_IOS_BUNDLE_IDENTIFIER ||
-      "com.yourcompany.yourapp",
+      "com.clerk.clerkexpoquickstart",
     ...(process.env.APPLE_TEAM_ID && {
       appleTeamId: process.env.APPLE_TEAM_ID,
     }),
@@ -45,7 +45,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-secure-store",
     "expo-font",
     "expo-apple-authentication",
-    "@clerk/clerk-expo",
+    "@clerk/expo",
   ],
   experiments: {
     typedRoutes: true,
@@ -53,7 +53,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   extra: {
     router: {},
     eas: {
-      projectId: process.env.EXPO_PUBLIC_EAS_PROJECT_ID || "Your Project ID",
+      projectId: process.env.EAS_PROJECT_ID || "Your Project ID",
     },
     EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME:
       process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME,

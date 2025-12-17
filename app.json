@@ -31,13 +31,13 @@
       "expo-secure-store",
       "expo-font",
       "expo-apple-authentication",
-      "@clerk/clerk-expo"
+      "@clerk/expo"
     ],
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
-      "router": {}
+      "EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME": ""
     }
   }
 }
