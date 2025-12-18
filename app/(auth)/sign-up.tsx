@@ -12,7 +12,7 @@ import { Link, useRouter } from "expo-router";
 // import GoogleSignInButton from '../components/GoogleSignInButton'
 
 export default function SignUpScreen() {
-  const { isLoaded, signUp, setActive } = useSignUp();
+  const { signUp, fetchStatus } = useSignUp();
   const router = useRouter();
 
   const [emailAddress, setEmailAddress] = React.useState("");
@@ -22,52 +22,58 @@ export default function SignUpScreen() {
 
   // Handle submission of sign-up form
   const onSignUpPress = async () => {
-    if (!isLoaded) return;
+    if (fetchStatus === "fetching") return;
 
     // Start sign-up process using email and password provided
-    try {
-      await signUp.create({
-        emailAddress,
-        password,
-      });
+    const { error } = await signUp.password({
+      emailAddress,
+      password,
+    });
 
-      // Send user an email with verification code
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-
-      // Set 'pendingVerification' to true to display second form
-      // and capture OTP code
-      setPendingVerification(true);
-    } catch (err) {
+    if (error) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
-      console.error(JSON.stringify(err, null, 2));
+      console.error(JSON.stringify(error, null, 2));
+      return;
     }
+
+    // Send user an email with verification code
+    const { error: sendCodeError } = await signUp.verifications.sendEmailCode();
+
+    if (sendCodeError) {
+      console.error(JSON.stringify(sendCodeError, null, 2));
+      return;
+    }
+
+    // Set 'pendingVerification' to true to display second form
+    // and capture OTP code
+    setPendingVerification(true);
   };
 
   // Handle submission of verification form
   const onVerifyPress = async () => {
-    if (!isLoaded) return;
+    if (fetchStatus === "fetching") return;
 
-    try {
-      // Use the code the user provided to attempt verification
-      const signUpAttempt = await signUp.attemptEmailAddressVerification({
-        code,
-      });
+    // Use the code the user provided to attempt verification
+    const { error } = await signUp.verifications.verifyEmailCode({
+      code,
+    });
 
-      // If verification was completed, set the session to active
-      // and redirect the user
-      if (signUpAttempt.status === "complete") {
-        await setActive({ session: signUpAttempt.createdSessionId });
-        router.replace("/");
-      } else {
-        // If the status is not complete, check why. User may need to
-        // complete further steps.
-        console.error(JSON.stringify(signUpAttempt, null, 2));
-      }
-    } catch (err) {
+    if (error) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
-      console.error(JSON.stringify(err, null, 2));
+      console.error(JSON.stringify(error, null, 2));
+      return;
+    }
+
+    // If verification was completed, finalize and redirect the user
+    if (signUp.status === "complete") {
+      await signUp.finalize();
+      router.replace("/");
+    } else {
+      // If the status is not complete, check why. User may need to
+      // complete further steps.
+      console.error("Sign-up status:", signUp.status);
     }
   };
 
