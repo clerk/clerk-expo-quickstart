@@ -10,7 +10,7 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "^2.17.0",
+    "@clerk/clerk-expo": "2.20.0-snapshot.v20260106160943",
     "@clerk/types": "^4.101.6",
     "@expo/vector-icons": "^15.0.2",
     "@react-navigation/native": "^7.0.0",

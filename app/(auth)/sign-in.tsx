@@ -3,6 +3,7 @@ import { Link, useRouter } from 'expo-router'
 import { Text, TextInput, Button, View } from 'react-native'
 import React from 'react'
 import type { EmailCodeFactor } from '@clerk/types'
+import GoogleSignInButton from '../components/GoogleSignInButton'
 
 export default function Page() {
   const { signIn, setActive, isLoaded } = useSignIn()
@@ -118,6 +119,7 @@ export default function Page() {
   return (
     <View>
       <Text>Sign in</Text>
+      <GoogleSignInButton />
       <TextInput
         autoCapitalize="none"
         value={emailAddress}
