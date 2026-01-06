@@ -1,4 +1,4 @@
-import { useSignInWithGoogle } from "@clerk/expo";
+import { useSignInWithGoogle } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import {
   Alert,

@@ -1,4 +1,4 @@
-import { useSignIn } from "@clerk/expo";
+import { useSignIn } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
 import {
   Text,
@@ -10,9 +10,10 @@ import {
 import React from "react";
 // import AppleSignInButton from "../components/AppleSignInButton";
 // import GoogleSignInButton from "../components/GoogleSignInButton";
+import GoogleSSOButton from "../components/GoogleSSOButton";
 
 export default function Page() {
-  const { signIn, fetchStatus } = useSignIn();
+  const { signIn, setActive, isLoaded } = useSignIn();
   const router = useRouter();
 
   const [emailAddress, setEmailAddress] = React.useState("");
@@ -20,29 +21,29 @@ export default function Page() {
 
   // Handle the submission of the sign-in form
   const onSignInPress = async () => {
-    if (fetchStatus === "fetching") return;
+    if (!isLoaded || !signIn) return;
 
-    // Start the sign-in process using the email and password provided
-    const { error } = await signIn.password({
-      identifier: emailAddress,
-      password,
-    });
+    try {
+      // Start the sign-in process using the email and password provided
+      const signInAttempt = await signIn.create({
+        identifier: emailAddress,
+        password,
+      });
 
-    if (error) {
+      // If sign-in process is complete, set the created session as active
+      // and redirect the user
+      if (signInAttempt.status === "complete") {
+        await setActive({ session: signInAttempt.createdSessionId });
+        router.replace("/");
+      } else {
+        // If the status isn't complete, check why. User might need to
+        // complete further steps.
+        console.error("Sign-in status:", signInAttempt.status);
+      }
+    } catch (err: any) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
-      console.error(JSON.stringify(error, null, 2));
-      return;
-    }
-
-    // If sign-in process is complete, finalize and redirect the user
-    if (signIn.status === "complete") {
-      await signIn.finalize();
-      router.replace("/");
-    } else {
-      // If the status isn't complete, check why. User might need to
-      // complete further steps.
-      console.error("Sign-in status:", signIn.status);
+      console.error(JSON.stringify(err, null, 2));
     }
   };
 
@@ -79,7 +80,7 @@ export default function Page() {
         - Environment variables (EXPO_PUBLIC_CLERK_GOOGLE_*)
         - iOS: @clerk/clerk-expo plugin in app.config.ts
       */}
-      {/* <GoogleSignInButton /> */}
+      <GoogleSSOButton />
 
       <TextInput
         style={styles.input}

@@ -45,7 +45,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-secure-store",
     "expo-font",
     "expo-apple-authentication",
-    "@clerk/expo",
   ],
   experiments: {
     typedRoutes: true,

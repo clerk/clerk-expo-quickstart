@@ -30,8 +30,7 @@
       "expo-router",
       "expo-secure-store",
       "expo-font",
-      "expo-apple-authentication",
-      "@clerk/expo"
+      "expo-apple-authentication"
     ],
     "experiments": {
       "typedRoutes": true
