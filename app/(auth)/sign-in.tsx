@@ -9,19 +9,19 @@ import {
   Button,
 } from "react-native";
 import React from "react";
-import type { EmailCodeFactor } from '@clerk/types'
+import type { EmailCodeFactor } from "@clerk/types";
 // import AppleSignInButton from "../components/AppleSignInButton";
 // import GoogleSignInButton from "../components/GoogleSignInButton";
 import GoogleSSOButton from "../components/GoogleSSOButton";
 
 export default function Page() {
-  const { signIn, setActive, isLoaded } = useSignIn()
-  const router = useRouter()
+  const { signIn, setActive, isLoaded } = useSignIn();
+  const router = useRouter();
 
-  const [emailAddress, setEmailAddress] = React.useState('')
-  const [password, setPassword] = React.useState('')
-  const [code, setCode] = React.useState('')
-  const [showEmailCode, setShowEmailCode] = React.useState(false)
+  const [emailAddress, setEmailAddress] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [code, setCode] = React.useState("");
+  const [showEmailCode, setShowEmailCode] = React.useState(false);
 
   // Handle the submission of the sign-in form
   const onSignInPress = React.useCallback(async () => {
@@ -32,81 +32,82 @@ export default function Page() {
       const signInAttempt = await signIn.create({
         identifier: emailAddress,
         password,
-      })
+      });
 
       // If sign-in process is complete, set the created session as active
       // and redirect the user
-      if (signInAttempt.status === 'complete') {
+      if (signInAttempt.status === "complete") {
         await setActive({
           session: signInAttempt.createdSessionId,
           navigate: async ({ session }) => {
             if (session?.currentTask) {
               // Check for tasks and navigate to custom UI to help users resolve them
               // See https://clerk.com/docs/guides/development/custom-flows/overview#session-tasks
-              console.log(session?.currentTask)
-              return
+              console.log(session?.currentTask);
+              return;
             }
 
-            router.replace('/')
+            router.replace("/");
           },
-        })
-      } else if (signInAttempt.status === 'needs_second_factor') {
+        });
+      } else if (signInAttempt.status === "needs_second_factor") {
         // Check if email_code is a valid second factor
         // This is required when Client Trust is enabled and the user
         // is signing in from a new device.
         // See https://clerk.com/docs/guides/secure/client-trust
         const emailCodeFactor = signInAttempt.supportedSecondFactors?.find(
-          (factor): factor is EmailCodeFactor => factor.strategy === 'email_code'
-        )
+          (factor): factor is EmailCodeFactor =>
+            factor.strategy === "email_code"
+        );
 
         if (emailCodeFactor) {
           await signIn.prepareSecondFactor({
-            strategy: 'email_code',
+            strategy: "email_code",
             emailAddressId: emailCodeFactor.emailAddressId,
-          })
-          setShowEmailCode(true)
+          });
+          setShowEmailCode(true);
         }
       } else {
         // If the status is not complete, check why. User may need to
         // complete further steps.
-        console.error(JSON.stringify(signInAttempt, null, 2))
+        console.error(JSON.stringify(signInAttempt, null, 2));
       }
     } catch (err) {
       // See https://clerk.com/docs/guides/development/custom-flows/error-handling
       // for more info on error handling
-      console.error(JSON.stringify(err, null, 2))
+      console.error(JSON.stringify(err, null, 2));
     }
-  }, [isLoaded, emailAddress, password])
+  }, [isLoaded, emailAddress, password]);
 
   // Handle the submission of the email verification code
   const onVerifyPress = React.useCallback(async () => {
-    if (!isLoaded) return
+    if (!isLoaded) return;
 
     try {
       const signInAttempt = await signIn.attemptSecondFactor({
-        strategy: 'email_code',
+        strategy: "email_code",
         code,
-      })
+      });
 
-      if (signInAttempt.status === 'complete') {
+      if (signInAttempt.status === "complete") {
         await setActive({
           session: signInAttempt.createdSessionId,
           navigate: async ({ session }) => {
             if (session?.currentTask) {
-              console.log(session?.currentTask)
-              return
+              console.log(session?.currentTask);
+              return;
             }
 
-            router.replace('/')
+            router.replace("/");
           },
-        })
+        });
       } else {
-        console.error(JSON.stringify(signInAttempt, null, 2))
+        console.error(JSON.stringify(signInAttempt, null, 2));
       }
     } catch (err) {
-      console.error(JSON.stringify(err, null, 2))
+      console.error(JSON.stringify(err, null, 2));
     }
-  }, [isLoaded, code])
+  }, [isLoaded, code]);
 
   // Display email code verification form
   if (showEmailCode) {
@@ -122,7 +123,7 @@ export default function Page() {
         />
         <Button title="Verify" onPress={onVerifyPress} />
       </View>
-    )
+    );
   }
 
   return (
@@ -158,7 +159,7 @@ export default function Page() {
         - Environment variables (EXPO_PUBLIC_CLERK_GOOGLE_*)
         - iOS: @clerk/clerk-expo plugin in app.config.ts
       */}
-      <GoogleSSOButton />
+      {/* <GoogleSSOButton /> */}
 
       <TextInput
         autoCapitalize="none"
@@ -175,14 +176,14 @@ export default function Page() {
         onChangeText={(password) => setPassword(password)}
       />
       <Button title="Sign in" onPress={onSignInPress} />
-      <View style={{ flexDirection: 'row', gap: 4 }}>
+      <View style={{ flexDirection: "row", gap: 4 }}>
         <Text>Don't have an account?</Text>
         <Link href="/sign-up">
           <Text>Sign up</Text>
         </Link>
       </View>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
