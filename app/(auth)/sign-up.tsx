@@ -2,7 +2,7 @@ import * as React from "react";
 import {
   Text,
   TextInput,
-  TouchableOpacity,
+  Button,
   View,
   StyleSheet,
 } from "react-native";
@@ -11,9 +11,9 @@ import { Link, useRouter } from "expo-router";
 // import AppleSignInButton from '../components/AppleSignInButton'
 // import GoogleSignInButton from '../components/GoogleSignInButton'
 
-export default function SignUpScreen() {
-  const { signUp, setActive, isLoaded } = useSignUp();
-  const router = useRouter();
+export default function Page() {
+  const { isLoaded, signUp, setActive } = useSignUp()
+  const router = useRouter()
 
   const [emailAddress, setEmailAddress] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -35,10 +35,10 @@ export default function SignUpScreen() {
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
 
       // Set 'pendingVerification' to true to display second form
-      // and capture OTP code
-      setPendingVerification(true);
-    } catch (err: any) {
-      // See https://clerk.com/docs/custom-flows/error-handling
+      // and capture code
+      setPendingVerification(true)
+    } catch (err) {
+      // See https://clerk.com/docs/guides/development/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2));
     }
@@ -56,16 +56,27 @@ export default function SignUpScreen() {
 
       // If verification was completed, set the session as active
       // and redirect the user
-      if (signUpAttempt.status === "complete") {
-        await setActive({ session: signUpAttempt.createdSessionId });
-        router.replace("/");
+      if (signUpAttempt.status === 'complete') {
+        await setActive({
+          session: signUpAttempt.createdSessionId,
+          navigate: async ({ session }) => {
+            if (session?.currentTask) {
+              // Check for tasks and navigate to custom UI to help users resolve them
+              // See https://clerk.com/docs/guides/development/custom-flows/overview#session-tasks
+              console.log(session?.currentTask)
+              return
+            }
+
+            router.replace('/')
+          },
+        })
       } else {
         // If the status is not complete, check why. User may need to
         // complete further steps.
         console.error("Sign-up status:", signUpAttempt.status);
       }
-    } catch (err: any) {
-      // See https://clerk.com/docs/custom-flows/error-handling
+    } catch (err) {
+      // See https://clerk.com/docs/guides/development/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2));
     }
@@ -73,19 +84,17 @@ export default function SignUpScreen() {
 
   if (pendingVerification) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Verify your email</Text>
+      <View>
+        <Text>Verify your email</Text>
         <TextInput
-          style={styles.input}
           value={code}
           placeholder="Enter your verification code"
+          placeholderTextColor="#666666"
           onChangeText={(code) => setCode(code)}
         />
-        <TouchableOpacity style={styles.button} onPress={onVerifyPress}>
-          <Text style={styles.buttonText}>Verify</Text>
-        </TouchableOpacity>
+        <Button title="Verify" onPress={onVerifyPress} />
       </View>
-    );
+    )
   }
 
   return (
@@ -124,26 +133,24 @@ export default function SignUpScreen() {
       {/* <GoogleSignInButton /> */}
 
       <TextInput
-        style={styles.input}
         autoCapitalize="none"
         value={emailAddress}
         placeholder="Enter email"
+        placeholderTextColor="#666666"
         onChangeText={(email) => setEmailAddress(email)}
       />
       <TextInput
-        style={styles.input}
         value={password}
         placeholder="Enter password"
+        placeholderTextColor="#666666"
         secureTextEntry={true}
         onChangeText={(password) => setPassword(password)}
       />
-      <TouchableOpacity style={styles.button} onPress={onSignUpPress}>
-        <Text style={styles.buttonText}>Continue</Text>
-      </TouchableOpacity>
-      <View style={styles.footer}>
-        <Text>Already have an account?</Text>
+      <Button title="Continue" onPress={onSignUpPress} />
+      <View style={{ flexDirection: 'row', gap: 4 }}>
+        <Text>Have an account?</Text>
         <Link href="/sign-in">
-          <Text style={styles.link}>Sign in</Text>
+          <Text>Sign in</Text>
         </Link>
       </View>
     </View>
@@ -161,35 +168,5 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 8,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 20,
-    gap: 5,
-  },
-  link: {
-    color: "#007AFF",
-    fontWeight: "600",
   },
 });

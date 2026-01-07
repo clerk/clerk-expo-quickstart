@@ -10,7 +10,8 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "^2.18.0",
+    "@clerk/clerk-expo": "https://pkg.pr.new/@clerk/clerk-expo@7538",
+    "@clerk/types": "^4.101.6",
     "@expo/vector-icons": "^15.0.2",
     "@react-native-community/netinfo": "^11.4.1",
     "@react-navigation/native": "^7.0.0",
