@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { Text, TextInput, Button, View } from 'react-native'
+import { Text, TextInput, Button, View, StyleSheet } from 'react-native'
 import { useSignUp } from '@clerk/clerk-expo'
 import { Link, useRouter } from 'expo-router'
+import GoogleSignInButton from '../components/GoogleSignInButton'
 
 export default function Page() {
   const { isLoaded, signUp, setActive } = useSignUp()
@@ -92,10 +93,10 @@ export default function Page() {
   }
 
   return (
-    <View>
-      <>
-        <Text>Sign up</Text>
-        <TextInput
+    <View style={styles.container}>
+      <Text style={styles.title}>Sign up</Text>
+      <GoogleSignInButton />
+      <TextInput
           autoCapitalize="none"
           value={emailAddress}
           placeholder="Enter email"
@@ -109,14 +110,37 @@ export default function Page() {
           secureTextEntry={true}
           onChangeText={(password) => setPassword(password)}
         />
-        <Button title="Continue" onPress={onSignUpPress} />
-        <View style={{ flexDirection: 'row', gap: 4 }}>
-          <Text>Have an account?</Text>
-          <Link href="/sign-in">
-            <Text>Sign in</Text>
-          </Link>
-        </View>
-      </>
+      <Button title="Continue" onPress={onSignUpPress} />
+      <View style={styles.footer}>
+        <Text>Have an account?</Text>
+        <Link href="/sign-in">
+          <Text style={styles.link}>Sign in</Text>
+        </Link>
+      </View>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+    gap: 4,
+  },
+  link: {
+    color: '#4285F4',
+    fontWeight: '600',
+  },
+})
