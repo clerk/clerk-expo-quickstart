@@ -1,17 +1,23 @@
 import { Link } from 'expo-router'
-import { View, Text, StyleSheet, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native'
 
 /**
- * Complete Examples of ALL clerk-ios Features
+ * Complete Examples of ALL Native Clerk Features
  *
- * This screen demonstrates access to all 107 SwiftUI components
- * from clerk-ios through 3 React Native components
+ * This screen demonstrates access to native components from:
+ * - iOS: clerk-ios (107 SwiftUI components)
+ * - Android: clerk-android (Jetpack Compose components)
+ *
+ * All accessed through 3 React Native components
  */
 export default function ExamplesPage() {
+  const platformName = Platform.OS === 'ios' ? 'iOS' : Platform.OS === 'android' ? 'Android' : 'Native'
+  const sdkName = Platform.OS === 'ios' ? 'clerk-ios' : Platform.OS === 'android' ? 'clerk-android' : 'clerk-native'
+
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Native iOS Components</Text>
-      <Text style={styles.subtitle}>All clerk-ios features available in React Native</Text>
+      <Text style={styles.title}>Native {platformName} Components</Text>
+      <Text style={styles.subtitle}>All {sdkName} features available in React Native</Text>
 
       {/* Authentication Examples */}
       <View style={styles.section}>
@@ -97,10 +103,10 @@ export default function ExamplesPage() {
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Total: 107 components from clerk-ios
+          Powered by {sdkName}
         </Text>
         <Text style={styles.footerSubtext}>
-          3 public components • 104 internal components
+          3 React Native components • Full native UI
         </Text>
       </View>
     </ScrollView>

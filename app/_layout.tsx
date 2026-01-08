@@ -10,9 +10,11 @@ import { requireNativeModule } from "expo-modules-core";
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+// Check if native module is supported on this platform
+const isNativeSupported = Platform.OS === "ios" || Platform.OS === "android";
+
 // Get the native module
-const ClerkExpo =
-  Platform.OS === "ios" ? requireNativeModule("ClerkExpo") : null;
+const ClerkExpo = isNativeSupported ? requireNativeModule("ClerkExpo") : null;
 
 // Component to sync native session to JS on startup
 function NativeSessionSync() {

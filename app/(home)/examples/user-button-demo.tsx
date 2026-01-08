@@ -38,7 +38,7 @@ export default function UserButtonDemoPage() {
         <Text style={styles.feature}>✓ Opens UserProfileView on tap</Text>
         <Text style={styles.feature}>✓ Account switcher (multi-session)</Text>
         <Text style={styles.feature}>✓ Quick sign out</Text>
-        <Text style={styles.feature}>✓ Native iOS animations</Text>
+        <Text style={styles.feature}>✓ Native platform animations</Text>
       </View>
     </View>
   )
