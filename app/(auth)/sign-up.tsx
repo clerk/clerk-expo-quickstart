@@ -1,19 +1,14 @@
 import * as React from "react";
-import {
-  Text,
-  TextInput,
-  Button,
-  View,
-  StyleSheet,
-} from "react-native";
+import { Text, TextInput, Button, View, StyleSheet } from "react-native";
 import { useSignUp } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
+import GoogleSignInButton from "../components/GoogleSignInButton";
 // import AppleSignInButton from '../components/AppleSignInButton'
 // import GoogleSignInButton from '../components/GoogleSignInButton'
 
 export default function Page() {
-  const { isLoaded, signUp, setActive } = useSignUp()
-  const router = useRouter()
+  const { isLoaded, signUp, setActive } = useSignUp();
+  const router = useRouter();
 
   const [emailAddress, setEmailAddress] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -36,7 +31,7 @@ export default function Page() {
 
       // Set 'pendingVerification' to true to display second form
       // and capture code
-      setPendingVerification(true)
+      setPendingVerification(true);
     } catch (err) {
       // See https://clerk.com/docs/guides/development/custom-flows/error-handling
       // for more info on error handling
@@ -56,20 +51,20 @@ export default function Page() {
 
       // If verification was completed, set the session as active
       // and redirect the user
-      if (signUpAttempt.status === 'complete') {
+      if (signUpAttempt.status === "complete") {
         await setActive({
           session: signUpAttempt.createdSessionId,
           navigate: async ({ session }) => {
             if (session?.currentTask) {
               // Check for tasks and navigate to custom UI to help users resolve them
               // See https://clerk.com/docs/guides/development/custom-flows/overview#session-tasks
-              console.log(session?.currentTask)
-              return
+              console.log(session?.currentTask);
+              return;
             }
 
-            router.replace('/')
+            router.replace("/");
           },
-        })
+        });
       } else {
         // If the status is not complete, check why. User may need to
         // complete further steps.
@@ -94,7 +89,7 @@ export default function Page() {
         />
         <Button title="Verify" onPress={onVerifyPress} />
       </View>
-    )
+    );
   }
 
   return (
@@ -147,7 +142,7 @@ export default function Page() {
         onChangeText={(password) => setPassword(password)}
       />
       <Button title="Continue" onPress={onSignUpPress} />
-      <View style={{ flexDirection: 'row', gap: 4 }}>
+      <View style={{ flexDirection: "row", gap: 4 }}>
         <Text>Have an account?</Text>
         <Link href="/sign-in">
           <Text>Sign in</Text>
