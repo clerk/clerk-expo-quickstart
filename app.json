@@ -26,13 +26,11 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": [
-      "expo-router",
-      "expo-secure-store",
-      "expo-font"
-    ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME": ""
     }
   }
 }

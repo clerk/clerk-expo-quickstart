@@ -10,13 +10,14 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "^2.17.0",
+    "@clerk/clerk-expo": "https://pkg.pr.new/@clerk/clerk-expo@7538",
     "@clerk/types": "^4.101.6",
     "@expo/vector-icons": "^15.0.2",
+    "@react-native-community/netinfo": "^11.4.1",
     "@react-navigation/native": "^7.0.0",
     "base-64": "^1.0.0",
-    "dequal": "^2.0.3",
-    "expo": "54.0.17",
+    "dotenv": "^17.2.3",
+    "expo": "54.0.25",
     "expo-apple-authentication": "~8.0.7",
     "expo-auth-session": "~7.0.8",
     "expo-constants": "~18.0.9",
@@ -32,20 +33,21 @@
     "expo-web-browser": "~15.0.8",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-native": "0.81.4",
+    "react-native": "0.81.5",
     "react-native-gesture-handler": "~2.28.0",
-    "react-native-reanimated": "~4.1.1",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
     "react-native-url-polyfill": "^3.0.0",
     "react-native-web": "^0.21.0",
-    "swr": "^2.3.6",
+    "react-native-worklets": "^0.6.1",
     "tslib": "^2.8.1"
   },
   "devDependencies": {
     "@babel/core": "^7.26.10",
+    "@expo/config-plugins": "^54.0.2",
     "@react-native-community/cli-server-api": "^15.1.0",
     "@types/react": "~19.1.17",
+    "dotenv": "^17.2.3",
     "typescript": "~5.9.3"
   },
   "private": true
