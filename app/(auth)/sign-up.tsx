@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Text, TextInput, Button, View, StyleSheet } from 'react-native'
-import { useSignUp } from '@clerk/clerk-expo'
+import { useSignUp } from '@clerk/expo/legacy'
 import { Link, useRouter } from 'expo-router'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 

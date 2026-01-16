@@ -1,8 +1,8 @@
-import { useSignIn } from '@clerk/clerk-expo'
+import { useSignIn } from '@clerk/expo/legacy'
 import { Link, useRouter } from 'expo-router'
 import { Text, TextInput, Button, View, StyleSheet } from 'react-native'
 import React from 'react'
-import type { EmailCodeFactor } from '@clerk/types'
+import type { EmailCodeFactor } from '@clerk/shared/types'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 
 export default function Page() {
