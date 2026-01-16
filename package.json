@@ -10,13 +10,14 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "^2.17.0",
-    "@clerk/types": "^4.101.6",
+    "@clerk/expo": "^2.19.26",
+        "@clerk/clerk-expo": "^2.17.0",
+    
     "@expo/vector-icons": "^15.0.2",
     "@react-navigation/native": "^7.0.0",
     "base-64": "^1.0.0",
     "dequal": "^2.0.3",
-    "expo": "54.0.17",
+    "expo": "54.0.31",
     "expo-apple-authentication": "~8.0.7",
     "expo-auth-session": "~7.0.8",
     "expo-constants": "~18.0.9",
@@ -32,7 +33,7 @@
     "expo-web-browser": "~15.0.8",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-native": "0.81.4",
+    "react-native": "0.81.5",
     "react-native-gesture-handler": "~2.28.0",
     "react-native-reanimated": "~4.1.1",
     "react-native-safe-area-context": "~5.6.0",

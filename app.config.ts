@@ -17,7 +17,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier:
-      process.env.IOS_BUNDLE_IDENTIFIER || "com.yourcompany.yourapp",
+      "com.yourcompany.yourapp",
     ...(process.env.APPLE_TEAM_ID && {
       appleTeamId: process.env.APPLE_TEAM_ID,
     }),
@@ -30,7 +30,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       foregroundImage: "./assets/images/adaptive-icon.png",
       backgroundColor: "#ffffff",
     },
-    package: process.env.ANDROID_PACKAGE || "com.yourcompany.yourapp",
+    "com.yourcompany.yourapp",
   },
   web: {
     bundler: "metro",
@@ -42,16 +42,28 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-secure-store",
     "expo-font",
     "expo-apple-authentication",
+    [
+      "@clerk/expo",
+      {
+        iosUrlScheme: process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME,
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,
   },
   extra: {
+    EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME:
+      process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME,
+    EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID:
+      process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID,
+    EXPO_PUBLIC_CLERK_GOOGLE_ANDROID_CLIENT_ID:
+      process.env.EXPO_PUBLIC_CLERK_GOOGLE_ANDROID_CLIENT_ID,
+    EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID:
+      process.env.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID,
     router: {},
-    ...(process.env.EAS_PROJECT_ID && {
-      eas: {
-        projectId: process.env.EAS_PROJECT_ID,
-      },
-    }),
+    eas: {
+      projectId: process.env.EAS_PROJECT_ID || "Your Project ID",
+    },
   },
 });

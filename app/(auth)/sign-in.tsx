@@ -1,8 +1,9 @@
-import { useSignIn } from '@clerk/clerk-expo'
+import { useSignIn } from '@clerk/expo/legacy'
 import { Link, useRouter } from 'expo-router'
-import { Text, TextInput, Button, View } from 'react-native'
+import { Text, TextInput, Button, View, StyleSheet } from 'react-native'
 import React from 'react'
-import type { EmailCodeFactor } from '@clerk/types'
+import type { EmailCodeFactor } from '@clerk/shared/types'
+import GoogleSignInButton from '../components/GoogleSignInButton'
 
 export default function Page() {
   const { signIn, setActive, isLoaded } = useSignIn()
@@ -116,8 +117,9 @@ export default function Page() {
   }
 
   return (
-    <View>
-      <Text>Sign in</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Sign in</Text>
+      <GoogleSignInButton />
       <TextInput
         autoCapitalize="none"
         value={emailAddress}
@@ -133,12 +135,36 @@ export default function Page() {
         onChangeText={(password) => setPassword(password)}
       />
       <Button title="Sign in" onPress={onSignInPress} />
-      <View style={{ flexDirection: 'row', gap: 4 }}>
+      <View style={styles.footer}>
         <Text>Don't have an account?</Text>
         <Link href="/sign-up">
-          <Text>Sign up</Text>
+          <Text style={styles.link}>Sign up</Text>
         </Link>
       </View>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+    gap: 4,
+  },
+  link: {
+    color: '#4285F4',
+    fontWeight: '600',
+  },
+})
