@@ -1,7 +1,7 @@
 import { SignOutButton } from '@/components/sign-out-button'
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
-import { SignedIn, SignedOut, useSession, useUser } from '@clerk/clerk-expo'
+import { Show, useSession, useUser } from '@clerk/expo'
 import { Link } from 'expo-router'
 import { StyleSheet } from 'react-native'
 
@@ -17,20 +17,18 @@ export default function Page() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title">Welcome!</ThemedText>
-      {/* Show the sign-in and sign-up buttons when the user is signed out */}
-      <SignedOut>
+      <Show when="signed-out">
         <Link href="/(auth)/sign-in">
           <ThemedText>Sign in</ThemedText>
         </Link>
         <Link href="/(auth)/sign-up">
           <ThemedText>Sign up</ThemedText>
         </Link>
-      </SignedOut>
-      {/* Show the sign-out button when the user is signed in */}
-      <SignedIn>
+      </Show>
+      <Show when="signed-in">
         <ThemedText>Hello {user?.emailAddresses[0].emailAddress}</ThemedText>
         <SignOutButton />
-      </SignedIn>
+      </Show>
     </ThemedView>
   )
 }
