@@ -22,7 +22,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <ClerkProvider publishableKey={publishableKey as string} tokenCache={tokenCache}>
+      <ClerkProvider publishableKey={publishableKey!} tokenCache={tokenCache}>
         <Stack>
           <Stack.Screen name="(home)" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
