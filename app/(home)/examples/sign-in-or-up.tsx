@@ -1,27 +1,35 @@
-import { SignIn } from '@clerk/clerk-expo/native'
-import { useRouter } from 'expo-router'
+import { useRouter } from "expo-router";
+import {
+  NativeModuleGuard,
+  isNativeModuleAvailable,
+} from "@/app/components/NativeModuleGuard";
 
 /**
  * Sign In or Sign Up Mode (Default)
  *
  * Allows users to choose between signing in or creating new accounts
- * This is the most flexible mode
- *
- * Combines all authentication features:
- * - All sign-in flows (email, phone, username, OAuth, passkeys, MFA)
- * - All sign-up flows (registration, verification, profile completion)
- * - Seamless switching between sign-in and sign-up
- * - Password reset and account recovery
  */
 export default function SignInOrUpPage() {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
-    <SignIn
+    <NativeModuleGuard title="Sign In or Sign Up">
+      <SignInComponent router={router} />
+    </NativeModuleGuard>
+  );
+}
+
+function SignInComponent({ router }: { router: ReturnType<typeof useRouter> }) {
+  if (!isNativeModuleAvailable()) return null;
+
+  const { AuthView } = require("@clerk/expo/native");
+
+  return (
+    <AuthView
       mode="signInOrUp"
       isDismissable={true}
-      onSuccess={() => router.replace('/(home)')}
-      onError={(error) => console.error('Auth error:', error)}
+      onSuccess={() => router.replace("/(home)")}
+      onError={(error: any) => console.error("Auth error:", error)}
     />
-  )
+  );
 }

@@ -1,6 +1,5 @@
-import { UserButton } from "@clerk/clerk-expo/native";
-import { Link } from "expo-router";
-import { useEffect, useState } from "react";
+import { useAuth, useUser, useClerk } from "@clerk/expo";
+import { Link, useRouter } from "expo-router";
 import {
   Text,
   View,
@@ -9,142 +8,63 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
-import { SignOutButton } from "@/app/components/SignOutButton";
-import { requireNativeModule } from "expo-modules-core";
 
-// Get the native module for modal presentation
-const ClerkExpo =
-  Platform.OS === "ios" ? requireNativeModule("ClerkExpo") : null;
-
-// Types for native session data
-interface NativeUser {
-  id: string;
-  firstName?: string;
-  lastName?: string;
-  imageUrl?: string;
-  primaryEmailAddress?: string;
+// Helper to check if native module is available
+function isNativeModuleAvailable(): boolean {
+  if (Platform.OS !== "ios" && Platform.OS !== "android") {
+    return false;
+  }
+  try {
+    const { requireNativeModule } = require("expo-modules-core");
+    const module = requireNativeModule("ClerkExpo");
+    return !!module;
+  } catch {
+    return false;
+  }
 }
 
-interface NativeSession {
-  sessionId: string;
-  status: string;
-  user?: NativeUser;
-}
+/**
+ * Home Screen
+ *
+ * Displays user info when signed in, or sign in/up buttons when not.
+ * Works in both Expo Go (JS-only) and development builds (native modules available).
+ */
+export default function HomePage() {
+  const router = useRouter();
+  const { isSignedIn, isLoaded } = useAuth();
+  const { user } = useUser();
+  const { signOut } = useClerk();
 
-// Custom hook to check native session state
-function useNativeSession() {
-  const [nativeSession, setNativeSession] = useState<NativeSession | null>(
-    null
-  );
-  const [isLoading, setIsLoading] = useState(true);
-
-  const checkSession = async () => {
-    if (!ClerkExpo?.getSession) {
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const session = await ClerkExpo.getSession();
-      console.log("[useNativeSession] Session data:", JSON.stringify(session));
-      setNativeSession(session);
-    } catch (err) {
-      console.log("[useNativeSession] Error:", err);
-      setNativeSession(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    checkSession();
-  }, []);
-
-  return { nativeSession, isLoading, refresh: checkSession };
-}
-
-export default function Page() {
-  const { nativeSession, isLoading, refresh } = useNativeSession();
-  const nativeUser = nativeSession?.user;
-
-  const isSignedIn = !!nativeSession?.sessionId;
-
-  const handleSignIn = async () => {
-    if (!ClerkExpo?.presentAuth) {
-      console.log("Native auth not available");
-      return;
-    }
-
-    try {
-      console.log("[Index] Presenting native sign-in modal");
-      const result = await ClerkExpo.presentAuth({
-        mode: "signIn",
-        dismissable: true,
-      });
-      console.log("[Index] Sign-in completed:", result);
-      // Refresh native session state
-      refresh();
-    } catch (err) {
-      console.log("[Index] Sign-in modal dismissed or error:", err);
-    }
-  };
-
-  const handleSignUp = async () => {
-    if (!ClerkExpo?.presentAuth) {
-      console.log("Native auth not available");
-      return;
-    }
-
-    try {
-      console.log("[Index] Presenting native sign-up modal");
-      const result = await ClerkExpo.presentAuth({
-        mode: "signUp",
-        dismissable: true,
-      });
-      console.log("[Index] Sign-up completed:", result);
-      // Refresh native session state
-      refresh();
-    } catch (err) {
-      console.log("[Index] Sign-up modal dismissed or error:", err);
-    }
-  };
-
-  const handleSignOut = async () => {
-    if (!ClerkExpo?.signOut) {
-      console.log("Native sign out not available");
-      return;
-    }
-
-    try {
-      console.log("[Index] Signing out...");
-      await ClerkExpo.signOut();
-      console.log("[Index] Signed out successfully");
-      // Refresh native session state
-      refresh();
-    } catch (err) {
-      console.log("[Index] Sign out error:", err);
-    }
-  };
-
-  if (isLoading) {
+  if (!isLoaded) {
     return (
-      <View style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF0000" />
-          <Text style={styles.loadingText}>Loading...</Text>
-        </View>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#FF0000" />
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }
 
-  if (isSignedIn) {
+  if (isSignedIn && user) {
+    const hasNativeModules = isNativeModuleAvailable();
+
+    // Dynamically import UserButton if native modules available
+    let UserButton: any = null;
+    if (hasNativeModules) {
+      try {
+        UserButton = require("@clerk/expo/native").UserButton;
+      } catch (e) {
+        // UserButton not available
+      }
+    }
+
     return (
-      <View style={styles.container}>
-        {/* Header with UserButton */}
+      <ScrollView style={styles.container}>
+        {/* Header with optional UserButton */}
         <View style={styles.header}>
-          <Text style={styles.title}>Home</Text>
-          {Platform.OS === "ios" && (
+          <Text style={styles.title}>Welcome</Text>
+          {UserButton && (
             <UserButton
               style={styles.userButton}
               onPress={() => console.log("UserButton pressed")}
@@ -154,15 +74,15 @@ export default function Page() {
 
         {/* User Profile Card */}
         <View style={styles.profileCard}>
-          {nativeUser?.imageUrl && (
-            <Image source={{ uri: nativeUser.imageUrl }} style={styles.avatar} />
+          {user.imageUrl && (
+            <Image source={{ uri: user.imageUrl }} style={styles.avatar} />
           )}
           <View style={styles.userInfo}>
             <Text style={styles.userName}>
-              {nativeUser?.firstName || "User"} {nativeUser?.lastName || ""}
+              {user.firstName || "User"} {user.lastName || ""}
             </Text>
             <Text style={styles.userEmail}>
-              {nativeUser?.primaryEmailAddress || "Signed In"}
+              {user.emailAddresses[0]?.emailAddress || "No email"}
             </Text>
           </View>
         </View>
@@ -170,47 +90,102 @@ export default function Page() {
         {/* Content */}
         <View style={styles.content}>
           <Text style={styles.welcomeText}>
-            Welcome back! You are signed in.
-          </Text>
-          <Text style={styles.sessionText}>
-            Session: {nativeSession?.sessionId?.substring(0, 20)}...
+            You're signed in using the Core-3 Signal API.
           </Text>
 
-          <Link href="/(home)/profile" style={styles.link}>
-            <Text style={styles.linkText}>View Profile (Native)</Text>
-          </Link>
+          <View style={styles.modeInfo}>
+            <Text style={styles.modeTitle}>Current Mode:</Text>
+            <Text style={styles.modeValue}>
+              {Platform.OS === "web"
+                ? "Web"
+                : hasNativeModules
+                ? "Development Build (Native)"
+                : "Expo Go (JS-only)"}
+            </Text>
+          </View>
 
-          <Link href="/(home)/examples" style={styles.link}>
-            <Text style={styles.linkText}>Browse All Examples</Text>
-          </Link>
+          {/* Navigation Links */}
+          <View style={styles.linksSection}>
+            <Text style={styles.sectionTitle}>Examples</Text>
+
+            {hasNativeModules && (
+              <>
+                <Link href="/(home)/profile" asChild>
+                  <TouchableOpacity style={styles.linkButton}>
+                    <Text style={styles.linkButtonText}>
+                      Native Profile Component
+                    </Text>
+                  </TouchableOpacity>
+                </Link>
+
+                <Link href="/(home)/examples" asChild>
+                  <TouchableOpacity style={styles.linkButton}>
+                    <Text style={styles.linkButtonText}>
+                      All Native Component Examples
+                    </Text>
+                  </TouchableOpacity>
+                </Link>
+              </>
+            )}
+
+            {!hasNativeModules && (
+              <View style={styles.expoGoNotice}>
+                <Text style={styles.expoGoNoticeTitle}>
+                  Running in Expo Go
+                </Text>
+                <Text style={styles.expoGoNoticeText}>
+                  Native components require a development build.{"\n"}
+                  Run `npx expo run:ios` or `npx expo run:android` for full
+                  native support.
+                </Text>
+              </View>
+            )}
+          </View>
 
           <TouchableOpacity
             style={[styles.button, styles.signOutButton]}
-            onPress={handleSignOut}
+            onPress={() => signOut()}
           >
             <Text style={styles.buttonText}>Sign Out</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     );
   }
 
   // Not signed in
   return (
-    <View style={styles.container}>
-      <View style={styles.authLinks}>
-        <Text style={styles.welcomeTitle}>Welcome</Text>
-        <Text style={styles.welcomeSubtitle}>
-          Sign in or create an account to continue
+    <View style={styles.authContainer}>
+      <View style={styles.authContent}>
+        <Text style={styles.authTitle}>Clerk Expo Quickstart</Text>
+        <Text style={styles.authSubtitle}>
+          Authentication for React Native apps using Core-3 Signal API
         </Text>
 
-        <TouchableOpacity style={styles.button} onPress={handleSignIn}>
-          <Text style={styles.buttonText}>Sign in (Native)</Text>
-        </TouchableOpacity>
+        <View style={styles.modeInfo}>
+          <Text style={styles.modeTitle}>Current Mode:</Text>
+          <Text style={styles.modeValue}>
+            {Platform.OS === "web"
+              ? "Web"
+              : isNativeModuleAvailable()
+              ? "Development Build (Native)"
+              : "Expo Go (JS-only)"}
+          </Text>
+        </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-          <Text style={styles.buttonText}>Sign up (Native)</Text>
-        </TouchableOpacity>
+        <Link href="/(auth)/sign-in" asChild>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Sign In</Text>
+          </TouchableOpacity>
+        </Link>
+
+        <Link href="/(auth)/sign-up" asChild>
+          <TouchableOpacity style={[styles.button, styles.secondaryButton]}>
+            <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+              Create Account
+            </Text>
+          </TouchableOpacity>
+        </Link>
       </View>
     </View>
   );
@@ -225,6 +200,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
     gap: 12,
   },
   loadingText: {
@@ -235,18 +211,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 16,
+    padding: 20,
     paddingTop: 60,
     borderBottomWidth: 1,
     borderBottomColor: "#e0e0e0",
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
+    color: "#1a1a1a",
   },
   userButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
   },
   profileCard: {
     flexDirection: "row",
@@ -254,7 +231,7 @@ const styles = StyleSheet.create({
     padding: 20,
     margin: 16,
     backgroundColor: "#f8f9fa",
-    borderRadius: 12,
+    borderRadius: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -281,7 +258,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   content: {
-    flex: 1,
     padding: 20,
     gap: 20,
   },
@@ -289,62 +265,110 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     textAlign: "center",
-    marginBottom: 10,
+    lineHeight: 24,
   },
-  sessionText: {
-    fontSize: 12,
-    color: "#999",
-    textAlign: "center",
-    fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
-  },
-  authLinks: {
-    flex: 1,
+  modeInfo: {
+    backgroundColor: "#f0f0f0",
+    padding: 16,
+    borderRadius: 12,
     alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-    gap: 16,
   },
-  welcomeTitle: {
-    fontSize: 28,
-    fontWeight: "bold",
+  modeTitle: {
+    fontSize: 12,
+    color: "#666",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  modeValue: {
+    fontSize: 16,
+    fontWeight: "600",
     color: "#333",
+    marginTop: 4,
+  },
+  linksSection: {
+    gap: 12,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 4,
+  },
+  linkButton: {
+    backgroundColor: "#007AFF",
+    padding: 16,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  linkButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  expoGoNotice: {
+    backgroundColor: "#fff3cd",
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#ffc107",
+  },
+  expoGoNoticeTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#856404",
     marginBottom: 8,
   },
-  welcomeSubtitle: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-    marginBottom: 24,
+  expoGoNoticeText: {
+    fontSize: 13,
+    color: "#856404",
+    lineHeight: 20,
   },
   button: {
-    paddingVertical: 14,
-    paddingHorizontal: 32,
     backgroundColor: "#FF0000",
-    borderRadius: 8,
-    minWidth: 220,
+    padding: 16,
+    borderRadius: 12,
     alignItems: "center",
+    minWidth: 220,
   },
   signOutButton: {
     backgroundColor: "#666",
+  },
+  secondaryButton: {
+    backgroundColor: "#fff",
+    borderWidth: 2,
+    borderColor: "#FF0000",
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
-    textAlign: "center",
   },
-  link: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    backgroundColor: "#FF0000",
-    borderRadius: 8,
-    minWidth: 200,
+  secondaryButtonText: {
+    color: "#FF0000",
+  },
+  authContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 24,
+  },
+  authContent: {
+    width: "100%",
+    maxWidth: 400,
+    gap: 20,
     alignItems: "center",
   },
-  linkText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
+  authTitle: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#1a1a1a",
     textAlign: "center",
+  },
+  authSubtitle: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    lineHeight: 24,
   },
 });

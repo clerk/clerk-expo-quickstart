@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import { View, Text, StyleSheet, Platform, TouchableOpacity } from "react-native";
 
 // Helper to check if native module is available
-function isNativeModuleAvailable(): boolean {
+export function isNativeModuleAvailable(): boolean {
   if (Platform.OS !== "ios" && Platform.OS !== "android") {
     return false;
   }
@@ -15,26 +15,30 @@ function isNativeModuleAvailable(): boolean {
   }
 }
 
-export default function ProfilePage() {
+interface NativeModuleGuardProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+/**
+ * Component that guards against native module usage in Expo Go.
+ * Shows a fallback message if native modules are not available.
+ */
+export function NativeModuleGuard({ title, children }: NativeModuleGuardProps) {
   const router = useRouter();
 
-  // Check if native modules are available
   if (!isNativeModuleAvailable()) {
     return (
       <View style={styles.container}>
         <View style={styles.content}>
-          <Text style={styles.title}>Native Profile</Text>
+          <Text style={styles.title}>{title}</Text>
           <Text style={styles.message}>
-            The native UserProfile component requires a development build.
+            This feature requires native modules which are not available in Expo Go.
           </Text>
           <Text style={styles.submessage}>
-            Run `npx expo run:ios` or `npx expo run:android` to use native
-            components.
+            Run `npx expo run:ios` or `npx expo run:android` to use native components.
           </Text>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => router.back()}
-          >
+          <TouchableOpacity style={styles.button} onPress={() => router.back()}>
             <Text style={styles.buttonText}>Go Back</Text>
           </TouchableOpacity>
         </View>
@@ -42,16 +46,7 @@ export default function ProfilePage() {
     );
   }
 
-  // Only import UserProfile when native modules are available
-  const { UserProfileView } = require("@clerk/expo/native");
-
-  return (
-    <UserProfileView
-      isDismissable={false}
-      onSignOut={() => router.replace("/(auth)/sign-in")}
-      style={{ flex: 1 }}
-    />
-  );
+  return <>{children}</>;
 }
 
 const styles = StyleSheet.create({

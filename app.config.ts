@@ -17,7 +17,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   ios: {
     supportsTablet: true,
-    deploymentTarget: "17.0",
     bundleIdentifier:
       process.env.EXPO_PUBLIC_IOS_BUNDLE_IDENTIFIER ||
       "com.yourcompany.yourapp",
@@ -46,7 +45,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-secure-store",
     "expo-font",
     "expo-apple-authentication",
-    "@clerk/clerk-expo",
+    "@clerk/expo",
   ],
   experiments: {
     typedRoutes: true,

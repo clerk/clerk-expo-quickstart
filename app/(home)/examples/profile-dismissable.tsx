@@ -1,46 +1,33 @@
-import { UserProfile } from '@clerk/clerk-expo/native'
-import { useRouter } from 'expo-router'
+import { useRouter } from "expo-router";
+import {
+  NativeModuleGuard,
+  isNativeModuleAvailable,
+} from "@/app/components/NativeModuleGuard";
 
 /**
  * Dismissable Profile Sheet
  *
  * User profile as a sheet that can be dismissed
- * Includes dismiss button in navigation bar
- * Perfect for modal profile views
- *
- * Provides access to 65+ profile management screens:
- *
- * Profile Section:
- * - View/edit profile info
- * - Manage emails (add, verify, remove, set primary)
- * - Manage phones (add, verify, remove, set primary)
- * - Update profile image
- *
- * Security Section:
- * - Change password
- * - Enable/configure MFA (SMS, TOTP)
- * - Manage backup codes
- * - Manage passkeys
- * - Connected OAuth accounts
- * - Active device sessions
- * - Revoke sessions
- *
- * Account Management:
- * - Account switching (multi-session)
- * - Add accounts
- * - Sign out
- * - Delete account
  */
 export default function ProfileDismissablePage() {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
-    <UserProfile
+    <NativeModuleGuard title="Profile (Dismissable)">
+      <ProfileComponent router={router} />
+    </NativeModuleGuard>
+  );
+}
+
+function ProfileComponent({ router }: { router: ReturnType<typeof useRouter> }) {
+  if (!isNativeModuleAvailable()) return null;
+
+  const { UserProfileView } = require("@clerk/expo/native");
+
+  return (
+    <UserProfileView
       isDismissable={true}
-      onSignOut={() => {
-        console.log('User signed out')
-        router.replace('/(auth)/sign-in')
-      }}
+      onSignOut={() => router.replace("/(auth)/sign-in")}
     />
-  )
+  );
 }

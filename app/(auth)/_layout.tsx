@@ -1,5 +1,5 @@
 import { Redirect, Stack } from "expo-router";
-import { useAuth } from "@clerk/clerk-expo";
+import { useAuth } from "@clerk/expo";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
 
 export default function UnAuthenticatedLayout() {

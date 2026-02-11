@@ -1,30 +1,36 @@
-import { SignIn } from '@clerk/clerk-expo/native'
-import { useRouter } from 'expo-router'
+import { useRouter } from "expo-router";
+import {
+  NativeModuleGuard,
+  isNativeModuleAvailable,
+} from "@/app/components/NativeModuleGuard";
 
 /**
  * Sign Up Only Mode
  *
  * Restricts the interface to sign-up flows only
  * Users can only create new accounts
- *
- * Includes all sign-up features:
- * - Email sign-up with verification
- * - Phone sign-up with SMS verification
- * - Username registration
- * - OAuth registration
- * - Profile completion
- * - Field collection
- * - Custom fields
  */
 export default function SignUpOnlyPage() {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
-    <SignIn
+    <NativeModuleGuard title="Sign Up Only">
+      <SignInComponent router={router} />
+    </NativeModuleGuard>
+  );
+}
+
+function SignInComponent({ router }: { router: ReturnType<typeof useRouter> }) {
+  if (!isNativeModuleAvailable()) return null;
+
+  const { AuthView } = require("@clerk/expo/native");
+
+  return (
+    <AuthView
       mode="signUp"
       isDismissable={true}
-      onSuccess={() => router.replace('/(home)')}
-      onError={(error) => console.error('Sign up error:', error)}
+      onSuccess={() => router.replace("/(home)")}
+      onError={(error: any) => console.error("Sign up error:", error)}
     />
-  )
+  );
 }

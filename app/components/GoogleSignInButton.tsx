@@ -1,5 +1,4 @@
-import { useSignInWithGoogle } from "@clerk/clerk-expo";
-import { useRouter } from "expo-router";
+import { useSignInWithGoogle, useClerk } from "@clerk/expo";
 import {
   Alert,
   Platform,
@@ -11,38 +10,6 @@ import {
 } from "react-native";
 import { useState } from "react";
 
-/**
- * GoogleSignInButton Component
- *
- * This component provides native Google Sign-In functionality for iOS and Android devices.
- *
- * SETUP REQUIRED BEFORE USE:
- *
- * 1. Configure Google Cloud Console:
- *    - Create OAuth 2.0 credentials for iOS and Android
- *    - Add SHA-1 certificate fingerprints for Android
- *    - Configure iOS URL scheme
- *
- * 2. Configure Clerk Dashboard:
- *    - Enable Google as an SSO connection: https://dashboard.clerk.com/last-active?path=user-authentication/sso-connections
- *
- * 3. Add your iOS and Android apps to Clerk Dashboard → Native Applications:
- *    - iOS Bundle ID: Must match your app.json
- *    - Android Package Name: Must match your app.json
- *
- * 4. Set Environment Variables in your .env file:
- *    - EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID=your-ios-client-id.apps.googleusercontent.com
- *    - EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID=your-android-client-id.apps.googleusercontent.com
- *    - EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=your-web-client-id.apps.googleusercontent.com
- *
- * 5. Build Configuration:
- *    - For EAS Build: Configure eas.json
- *    - For local build: Run `npx expo prebuild`
- *
- * @param onSignInComplete - Optional callback called when sign-in completes successfully
- * @param showDivider - Whether to show "OR" divider below button (default: true)
- */
-
 interface GoogleSignInButtonProps {
   onSignInComplete?: () => void;
   showDivider?: boolean;
@@ -53,7 +20,7 @@ export default function GoogleSignInButton({
   showDivider = true,
 }: GoogleSignInButtonProps) {
   const { startGoogleAuthenticationFlow } = useSignInWithGoogle();
-  const router = useRouter();
+  const clerk = useClerk();
   const [isLoading, setIsLoading] = useState(false);
 
   // Only render on iOS and Android
@@ -69,17 +36,37 @@ export default function GoogleSignInButton({
         await startGoogleAuthenticationFlow();
 
       if (createdSessionId && setActive) {
+        // setActive sets the session; the layout redirects reactively.
         await setActive({ session: createdSessionId });
-
-        if (onSignInComplete) {
-          onSignInComplete();
-        } else {
-          router.replace("/");
-        }
+        onSignInComplete?.();
       }
     } catch (err: any) {
       // Handle user cancellation
       if (err.code === "SIGN_IN_CANCELLED" || err.code === "-5") {
+        return;
+      }
+
+      // "Already signed in" means the session exists but the JS SDK
+      // doesn't know about it yet. Reload client resources to sync.
+      const isAlreadySignedIn =
+        err.message?.includes("already signed in") ||
+        err.errors?.[0]?.code === "session_exists";
+
+      if (isAlreadySignedIn) {
+        try {
+          const clerkAny = clerk as any;
+          if (typeof clerkAny.__internal_reloadInitialResources === 'function') {
+            await clerkAny.__internal_reloadInitialResources();
+          }
+          // After reload, the session should be in the client — activate it
+          const activeSession = clerk.client?.sessions?.[0];
+          if (activeSession) {
+            await clerk.setActive({ session: activeSession.id });
+          }
+        } catch {
+          // Fallback: show error if recovery fails
+          Alert.alert("Sign-In Error", "Please restart the app and try again.");
+        }
         return;
       }
 
