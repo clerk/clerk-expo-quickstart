@@ -33,7 +33,7 @@ This quickstart demonstrates how to integrate Clerk with Expo and works with **E
 
 After following the quickstart you'll have learned how to:
 
-- Install `@clerk/clerk-expo`
+- Install `@clerk/expo`
 - Setup your environment key
 - Wrap your Expo app in `<ClerkProvider />` and supply your `tokenCache`
 - Conditionally show content based on your auth state

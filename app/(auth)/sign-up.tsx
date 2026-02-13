@@ -1,6 +1,6 @@
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
-import { useSignUp } from '@clerk/clerk-expo'
+import { useSignUp } from "@clerk/expo/legacy"
 import { Link, useRouter } from 'expo-router'
 import * as React from 'react'
 import { Pressable, StyleSheet, TextInput, View } from 'react-native'
