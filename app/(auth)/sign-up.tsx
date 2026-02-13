@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import GoogleSignInButton from "@/app/components/GoogleSignInButton";
 import AppleSignInButton from "@/app/components/AppleSignInButton";
+import { isNativeModuleAvailable } from "@/app/components/NativeModuleGuard";
 
 /**
  * Core-3 Sign Up Screen
@@ -32,6 +33,7 @@ export default function SignUpScreen() {
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [pendingVerification, setPendingVerification] = useState(false);
+  const [showNativeAuth, setShowNativeAuth] = useState(false);
 
   const isLoading = fetchStatus === "fetching";
 
@@ -67,6 +69,25 @@ export default function SignUpScreen() {
       await signUp.finalize();
     }
   };
+
+  // Show native AuthView as full-screen modal
+  if (showNativeAuth) {
+    const { AuthView } = require("@clerk/expo/native");
+    return (
+      <AuthView
+        mode="signUp"
+        isDismissable={true}
+        onSuccess={() => setShowNativeAuth(false)}
+        onDismiss={() => setShowNativeAuth(false)}
+        onError={(error: any) => {
+          console.error("Native auth error:", error);
+          setShowNativeAuth(false);
+        }}
+      />
+    );
+  }
+
+  const hasNativeModules = isNativeModuleAvailable();
 
   // Email verification screen
   if (pendingVerification) {
@@ -144,6 +165,29 @@ export default function SignUpScreen() {
           <Text style={styles.title}>Create Account</Text>
           <Text style={styles.subtitle}>Sign up to get started</Text>
         </View>
+
+        {/* Native Auth Button */}
+        {hasNativeModules && (
+          <TouchableOpacity
+            style={styles.nativeAuthButton}
+            onPress={async () => {
+              // Clear any stale native session so AuthView presents the modal
+              // instead of trying to sync an existing session
+              try {
+                const { requireNativeModule } = require("expo-modules-core");
+                const ClerkExpo = requireNativeModule("ClerkExpo");
+                await ClerkExpo.signOut();
+              } catch (e) {
+                // ignore
+              }
+              setShowNativeAuth(true);
+            }}
+          >
+            <Text style={styles.nativeAuthButtonText}>
+              Use Native Sign Up
+            </Text>
+          </TouchableOpacity>
+        )}
 
         {/* Native OAuth Buttons */}
         <View style={styles.oauthSection}>
@@ -340,6 +384,18 @@ const styles = StyleSheet.create({
   linkText: {
     color: "#FF0000",
     fontSize: 14,
+    fontWeight: "600",
+  },
+  nativeAuthButton: {
+    backgroundColor: "#34C759",
+    padding: 16,
+    borderRadius: 12,
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  nativeAuthButtonText: {
+    color: "#fff",
+    fontSize: 16,
     fontWeight: "600",
   },
 });

@@ -1,4 +1,5 @@
-import { useSignInWithGoogle, useClerk } from "@clerk/expo";
+import { useClerk } from "@clerk/expo";
+import { useSignInWithGoogle } from "@clerk/expo/google";
 import {
   Alert,
   Platform,

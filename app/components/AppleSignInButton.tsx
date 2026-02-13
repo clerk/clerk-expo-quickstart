@@ -1,4 +1,4 @@
-import { useSignInWithApple } from "@clerk/expo";
+import { useSignInWithApple } from "@clerk/expo/apple";
 import { useRouter } from "expo-router";
 import {
   Alert,
