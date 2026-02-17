@@ -1,42 +1,87 @@
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
-import { useAuth, useSignIn } from '@clerk/expo'
-import { Link, useRouter } from 'expo-router'
+import { useSignIn } from '@clerk/expo'
+import { type Href, Link, useRouter } from 'expo-router'
 import React from 'react'
 import { Pressable, StyleSheet, TextInput, View } from 'react-native'
 
 export default function Page() {
-  const { signIn } = useSignIn()
-  const { isSignedIn } = useAuth()
+  const { signIn, errors, fetchStatus } = useSignIn()
   const router = useRouter()
 
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
+  const [code, setCode] = React.useState('')
 
-  // Handle the submission of the sign-in form
-  const onSignInPress = React.useCallback(async () => {
+  const handleSubmit = async () => {
     await signIn.password({
       emailAddress,
       password,
     })
 
+    // Client trust
     if (signIn.status === 'needs_second_factor') {
-      // Further set up is required for multi-factor authentication
-      // See https://clerk.com/docs/guides/development/custom-flows/authentication/email-password-mfa
-      return null
+      await signIn.mfa.sendEmailCode()
     }
 
     if (signIn.status === 'complete') {
       await signIn.finalize({
-        navigate: () => {
-          router.push('/')
+        navigate: ({ decorateUrl }) => {
+          const url = decorateUrl('/')
+          if (url.startsWith('http')) {
+            window.location.href = url
+          } else {
+            router.push(url as Href)
+          }
         },
       })
     }
-  }, [signIn, emailAddress, password, router])
+  }
 
-  if (signIn.status === 'complete' || isSignedIn) {
-    return null
+  const handleVerify = async () => {
+    await signIn.mfa.verifyEmailCode({ code })
+
+    if (signIn.status === 'complete') {
+      await signIn.finalize({
+        navigate: ({ decorateUrl }) => {
+          const url = decorateUrl('/')
+          if (url.startsWith('http')) {
+            window.location.href = url
+          } else {
+            router.push(url as Href)
+          }
+        },
+      })
+    }
+  }
+
+  if (signIn.status === 'needs_second_factor') {
+    return (
+      <ThemedView style={styles.container}>
+        <ThemedText type="title" style={styles.title}>
+          Verify your account
+        </ThemedText>
+        <TextInput
+          style={styles.input}
+          value={code}
+          placeholder="Enter your verification code"
+          placeholderTextColor="#666666"
+          onChangeText={(code) => setCode(code)}
+          keyboardType="numeric"
+        />
+        {errors.fields.code && <ThemedText style={styles.error}>{errors.fields.code.message}</ThemedText>}
+        <Pressable
+          style={({ pressed }) => [styles.button, fetchStatus === 'fetching' && styles.buttonDisabled, pressed && styles.buttonPressed]}
+          onPress={handleVerify}
+          disabled={fetchStatus === 'fetching'}
+        >
+          <ThemedText style={styles.buttonText}>Verify</ThemedText>
+        </Pressable>
+        <Pressable style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]} onPress={() => signIn.mfa.sendEmailCode()}>
+          <ThemedText style={styles.secondaryButtonText}>I need a new code</ThemedText>
+        </Pressable>
+      </ThemedView>
+    )
   }
 
   return (
@@ -54,6 +99,7 @@ export default function Page() {
         onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
         keyboardType="email-address"
       />
+      {errors.fields.identifier && <ThemedText style={styles.error}>{errors.fields.identifier.message}</ThemedText>}
       <ThemedText style={styles.label}>Password</ThemedText>
       <TextInput
         style={styles.input}
@@ -63,17 +109,21 @@ export default function Page() {
         secureTextEntry={true}
         onChangeText={(password) => setPassword(password)}
       />
+      {errors.fields.password && <ThemedText style={styles.error}>{errors.fields.password.message}</ThemedText>}
       <Pressable
         style={({ pressed }) => [
           styles.button,
-          (!emailAddress || !password) && styles.buttonDisabled,
+          (!emailAddress || !password || fetchStatus === 'fetching') && styles.buttonDisabled,
           pressed && styles.buttonPressed,
         ]}
-        onPress={onSignInPress}
-        disabled={!emailAddress || !password}
+        onPress={handleSubmit}
+        disabled={!emailAddress || !password || fetchStatus === 'fetching'}
       >
-        <ThemedText style={styles.buttonText}>Sign in</ThemedText>
+        <ThemedText style={styles.buttonText}>Continue</ThemedText>
       </Pressable>
+      {/* For your debugging purposes. You can just console.log errors, but we put them in the UI for convenience */}
+      {errors && <ThemedText style={styles.debug}>{JSON.stringify(errors, null, 2)}</ThemedText>}
+
       <View style={styles.linkContainer}>
         <ThemedText>Don't have an account? </ThemedText>
         <Link href="/sign-up">
@@ -92,11 +142,6 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: 8,
-  },
-  description: {
-    fontSize: 14,
-    marginBottom: 16,
-    opacity: 0.8,
   },
   label: {
     fontWeight: '600',
@@ -128,16 +173,31 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
   },
-  switchContainer: {
-    flexDirection: 'row',
+  secondaryButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginVertical: 8,
+    marginTop: 8,
+  },
+  secondaryButtonText: {
+    color: '#0a7ea4',
+    fontWeight: '600',
   },
   linkContainer: {
     flexDirection: 'row',
     gap: 4,
     marginTop: 12,
     alignItems: 'center',
+  },
+  error: {
+    color: '#d32f2f',
+    fontSize: 12,
+    marginTop: -8,
+  },
+  debug: {
+    fontSize: 10,
+    opacity: 0.5,
+    marginTop: 8,
   },
 })

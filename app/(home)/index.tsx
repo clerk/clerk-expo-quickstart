@@ -29,6 +29,12 @@ export default function Page() {
         <ThemedText>Hello {user?.emailAddresses[0].emailAddress}</ThemedText>
         <SignOutButton />
       </Show>
+      <Show
+        when={{ permission: 'org:premium_access:manage' }}
+        fallback={<ThemedText>You do not have permission to manage the team settings</ThemedText>}
+      >
+        <ThemedText>You have permission to manage the team settings</ThemedText>
+      </Show>
     </ThemedView>
   )
 }

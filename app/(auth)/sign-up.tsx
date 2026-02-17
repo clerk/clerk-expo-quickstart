@@ -1,79 +1,79 @@
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
-import { useAuth, useSignIn } from '@clerk/expo'
-import { Link, useRouter } from 'expo-router'
+import { useAuth, useSignUp } from '@clerk/expo'
+import { type Href, Link, useRouter } from 'expo-router'
 import React from 'react'
-import { Pressable, StyleSheet, Switch, TextInput, View } from 'react-native'
+import { Pressable, StyleSheet, TextInput, View } from 'react-native'
 
 export default function Page() {
-  const { signIn } = useSignIn()
+  const { signUp, errors, fetchStatus } = useSignUp()
   const { isSignedIn } = useAuth()
   const router = useRouter()
 
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [code, setCode] = React.useState('')
-  const [useBackupCode, setUseBackupCode] = React.useState(false)
 
-  // Handle the submission of the sign-in form
-  const onSignInPress = React.useCallback(async () => {
-    await signIn.password({
+  const handleSubmit = async () => {
+    const error = await signUp.password({
       emailAddress,
       password,
     })
 
-    if (signIn.status === 'complete') {
-      await signIn.finalize({
-        navigate: () => {
-          router.push('/')
+    if (!error) await signUp.verifications.sendEmailCode()
+  }
+
+  const handleVerify = async () => {
+    await signUp.verifications.verifyEmailCode({
+      code,
+    })
+    if (signUp.status === 'complete') {
+      await signUp.finalize({
+        // Redirect the user to the home page after signing up
+        navigate: ({ decorateUrl }) => {
+          const url = decorateUrl('/')
+          if (url.startsWith('http')) {
+            window.location.href = url
+          } else {
+            router.push(url as Href)
+          }
         },
       })
     }
-  }, [signIn, emailAddress, password, router])
+  }
 
-  // Handle the submission of the MFA code
-  const onVerifyPress = React.useCallback(async () => {
-    if (useBackupCode) {
-      await signIn.mfa.verifyBackupCode({ code })
-    } else {
-      await signIn.mfa.verifyTOTP({ code })
-    }
-
-    if (signIn.status === 'complete') {
-      await signIn.finalize({
-        navigate: () => {
-          router.push('/')
-        },
-      })
-    }
-  }, [signIn, code, useBackupCode, router])
-
-  if (signIn.status === 'complete' || isSignedIn) {
+  if (signUp.status === 'complete' || isSignedIn) {
     return null
   }
 
-  // Display MFA verification form
-  if (signIn.status === 'needs_second_factor') {
+  if (
+    signUp.status === 'missing_requirements' &&
+    signUp.unverifiedFields.includes('email_address') &&
+    signUp.missingFields.length === 0
+  ) {
     return (
       <ThemedView style={styles.container}>
         <ThemedText type="title" style={styles.title}>
           Verify your account
         </ThemedText>
-        <ThemedText style={styles.description}>Enter the verification code from your authenticator app.</ThemedText>
         <TextInput
           style={styles.input}
           value={code}
-          placeholder="Enter verification code"
+          placeholder="Enter your verification code"
           placeholderTextColor="#666666"
           onChangeText={(code) => setCode(code)}
           keyboardType="numeric"
         />
-        <View style={styles.switchContainer}>
-          <ThemedText style={styles.label}>Use backup code</ThemedText>
-          <Switch value={useBackupCode} onValueChange={setUseBackupCode} />
-        </View>
-        <Pressable style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]} onPress={onVerifyPress}>
+        {errors.fields.code && <ThemedText style={styles.error}>{errors.fields.code.message}</ThemedText>}
+        <Pressable
+          style={({ pressed }) => [styles.button, fetchStatus === 'fetching' && styles.buttonDisabled, pressed && styles.buttonPressed]}
+          onPress={handleVerify}
+          disabled={fetchStatus === 'fetching'}
+        >
           <ThemedText style={styles.buttonText}>Verify</ThemedText>
+        </Pressable>
+        <Pressable style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]} onPress={() => signUp.verifications.sendEmailCode()}>
+          <ThemedText style={styles.secondaryButtonText}>I need a new code</ThemedText>
         </Pressable>
       </ThemedView>
     )
@@ -82,7 +82,7 @@ export default function Page() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title" style={styles.title}>
-        Sign in
+        Sign up
       </ThemedText>
       <ThemedText style={styles.label}>Email address</ThemedText>
       <TextInput
@@ -94,6 +94,8 @@ export default function Page() {
         onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
         keyboardType="email-address"
       />
+      {/* You can use `signInErrors` and `signUpErrors` to display errors to the user */}
+      {errors.fields.emailAddress && <ThemedText style={styles.error}>{errors.fields.emailAddress.message}</ThemedText>}
       <ThemedText style={styles.label}>Password</ThemedText>
       <TextInput
         style={styles.input}
@@ -103,23 +105,30 @@ export default function Page() {
         secureTextEntry={true}
         onChangeText={(password) => setPassword(password)}
       />
+      {errors.fields.password && <ThemedText style={styles.error}>{errors.fields.password.message}</ThemedText>}
       <Pressable
         style={({ pressed }) => [
           styles.button,
-          (!emailAddress || !password) && styles.buttonDisabled,
+          (!emailAddress || !password || fetchStatus === 'fetching') && styles.buttonDisabled,
           pressed && styles.buttonPressed,
         ]}
-        onPress={onSignInPress}
-        disabled={!emailAddress || !password}
+        onPress={handleSubmit}
+        disabled={!emailAddress || !password || fetchStatus === 'fetching'}
       >
-        <ThemedText style={styles.buttonText}>Sign in</ThemedText>
+        <ThemedText style={styles.buttonText}>Sign up</ThemedText>
       </Pressable>
+      {/* For your debugging purposes. You can just console.log errors, but we put them in the UI for convenience */}
+      {errors && <ThemedText style={styles.debug}>{JSON.stringify(errors, null, 2)}</ThemedText>}
+
       <View style={styles.linkContainer}>
-        <ThemedText>Don't have an account? </ThemedText>
-        <Link href="/sign-up">
-          <ThemedText type="link">Sign up</ThemedText>
+        <ThemedText>Already have an account? </ThemedText>
+        <Link href="/sign-in">
+          <ThemedText type="link">Sign in</ThemedText>
         </Link>
       </View>
+
+      {/* Required for sign-up flows. Clerk's bot sign-up protection is enabled by default */}
+      <View nativeID="clerk-captcha" />
     </ThemedView>
   )
 }
@@ -132,11 +141,6 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: 8,
-  },
-  description: {
-    fontSize: 14,
-    marginBottom: 16,
-    opacity: 0.8,
   },
   label: {
     fontWeight: '600',
@@ -168,16 +172,31 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
   },
-  switchContainer: {
-    flexDirection: 'row',
+  secondaryButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginVertical: 8,
+    marginTop: 8,
+  },
+  secondaryButtonText: {
+    color: '#0a7ea4',
+    fontWeight: '600',
   },
   linkContainer: {
     flexDirection: 'row',
     gap: 4,
     marginTop: 12,
     alignItems: 'center',
+  },
+  error: {
+    color: '#d32f2f',
+    fontSize: 12,
+    marginTop: -8,
+  },
+  debug: {
+    fontSize: 10,
+    opacity: 0.5,
+    marginTop: 8,
   },
 })
