@@ -1,8 +1,6 @@
-import { useAuth, useUser, useClerk, getClerkInstance } from "@clerk/expo";
-import { UserButton } from "@clerk/expo/native";
-import { useRouter } from "expo-router";
-import { requireNativeModule } from "expo-modules-core";
-import * as SecureStore from "expo-secure-store";
+import { useEffect, useState } from "react";
+import { useAuth, useUser, useClerk } from "@clerk/expo";
+import { AuthView, UserButton, UserProfileView } from "@clerk/expo/native";
 import {
   Text,
   View,
@@ -13,99 +11,18 @@ import {
   ScrollView,
 } from "react-native";
 
-// TODO: Inline AuthView presentation has safe area issues when embedded in React Native views.
-// ClerkKitUI's AuthView ignores additionalSafeAreaInsets because it's designed for
-// full-screen modal presentation. Fix requires changes in:
-//   1. @clerk/expo's ExpoView hosting — propagate window safe area to hosting controller
-//   2. ClerkKitUI — respect safe area insets when rendered inline (not as full-screen modal)
-// Using modal presentation until inline safe area is resolved.
-
-const ClerkExpo = requireNativeModule("ClerkExpo");
-
-/** Sync an existing native session to the JS SDK. */
-async function syncNativeSession() {
-  console.log("[syncNativeSession] Starting sync...");
-  const token = await ClerkExpo.getClientToken();
-  console.log("[syncNativeSession] Got token:", token ? `yes (${token.substring(0, 20)}...)` : "no");
-  if (!token) return false;
-
-  try {
-    console.log("[syncNativeSession] Setting SecureStore...");
-    await SecureStore.setItemAsync("__clerk_client_jwt", token, {
-      keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
-    });
-    console.log("[syncNativeSession] SecureStore set OK");
-
-    const clerkInstance = getClerkInstance() as any;
-    console.log("[syncNativeSession] Has __internal_reloadInitialResources:", typeof clerkInstance?.__internal_reloadInitialResources);
-    if (typeof clerkInstance?.__internal_reloadInitialResources === "function") {
-      console.log("[syncNativeSession] Calling __internal_reloadInitialResources...");
-      await clerkInstance.__internal_reloadInitialResources();
-      console.log("[syncNativeSession] __internal_reloadInitialResources done");
-    }
-
-    // Check what the client looks like after reload
-    const sessions = clerkInstance?.client?.sessions;
-    console.log("[syncNativeSession] Client sessions count:", sessions?.length ?? 0);
-    if (sessions?.length > 0) {
-      sessions.forEach((s: any) => console.log("[syncNativeSession] Session:", s.id, s.status));
-    }
-    console.log("[syncNativeSession] Client activeSessions:", clerkInstance?.client?.activeSessions?.length ?? 0);
-
-    // Get the native session to find the session ID
-    console.log("[syncNativeSession] Calling getSession...");
-    const sessionData = await ClerkExpo.getSession();
-    const sessionId = sessionData?.session?.id;
-    console.log("[syncNativeSession] sessionId:", sessionId);
-
-    // Check if session is in client
-    const sessionInClient = sessions?.some((s: any) => s.id === sessionId);
-    console.log("[syncNativeSession] Session in client:", sessionInClient);
-
-    if (sessionId && typeof clerkInstance?.setActive === "function") {
-      console.log("[syncNativeSession] Calling setActive...");
-      await clerkInstance.setActive({ session: sessionId });
-      console.log("[syncNativeSession] setActive done, isSignedIn:", clerkInstance?.session?.id);
-    }
-    return true;
-  } catch (err: any) {
-    console.log("[syncNativeSession] ERROR:", err?.message, err?.code);
-    throw err;
-  }
-}
-
-/** Present the native auth modal and sync the session back to the JS SDK. */
-async function presentNativeAuth() {
-  console.log("[presentNativeAuth] Called");
-  let result;
-  try {
-    result = await ClerkExpo.presentAuth({
-      mode: "signInOrUp",
-      dismissable: true,
-    });
-    console.log("[presentNativeAuth] Result:", JSON.stringify(result));
-  } catch (e: any) {
-    console.log("[presentNativeAuth] Error:", e?.message, e?.code);
-    // If native SDK already has a session, sync it to JS SDK
-    const msg = e?.message || "";
-    if (msg.includes("already signed in") || msg.includes("AlreadySignedIn")) {
-      console.log("[presentNativeAuth] Already signed in, syncing session...");
-      await syncNativeSession();
-      return;
-    }
-    throw e;
-  }
-
-  if (result.sessionId) {
-    await syncNativeSession();
-  }
-}
-
 export default function MainScreen() {
   const { isSignedIn, isLoaded } = useAuth();
   const { user } = useUser();
   const { signOut } = useClerk();
-  const router = useRouter();
+  const [showAuth, setShowAuth] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+
+  // Reset modal state when auth state changes
+  useEffect(() => {
+    setShowAuth(false);
+    setShowProfile(false);
+  }, [isSignedIn]);
 
   if (!isLoaded) {
     return (
@@ -115,30 +32,39 @@ export default function MainScreen() {
     );
   }
 
-  // Signed-out state — matches the native iOS quickstart pattern:
-  // Tap "Sign In / Sign Up" to present the native auth modal.
   if (!isSignedIn) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.signedOutContainer}>
-          <Text style={styles.appTitle}>Clerk + Expo</Text>
-          <Text style={styles.appSubtitle}>Native Components Quickstart</Text>
-          <TouchableOpacity
-            style={styles.signInButton}
-            onPress={() => {
-              presentNativeAuth().catch(() => {
-                // Modal dismissed or error — nothing to do
-              });
-            }}
-          >
-            <Text style={styles.signInButtonText}>Sign In / Sign Up</Text>
-          </TouchableOpacity>
+    // While auth is in progress, show a loading spinner behind the native modal.
+    // This prevents the landing page from flashing when the modal closes
+    // but the JS SDK hasn't finished syncing the session yet.
+    if (showAuth) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" />
+          <AuthView
+            mode="signInOrUp"
+            onDismiss={() => setShowAuth(false)}
+          />
         </View>
+      );
+    }
+
+    return (
+      <View style={styles.landingContainer}>
+        <Text style={styles.landingTitle}>Clerk + Expo</Text>
+        <Text style={styles.landingSubtitle}>
+          Native Components Quickstart
+        </Text>
+
+        <TouchableOpacity
+          style={styles.signInButton}
+          onPress={() => setShowAuth(true)}
+        >
+          <Text style={styles.signInButtonText}>Sign In / Sign Up</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
-  // Signed-in state — UserButton in header, user info, links to demos
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -166,7 +92,7 @@ export default function MainScreen() {
 
           <TouchableOpacity
             style={styles.linkButton}
-            onPress={() => router.push("/profile")}
+            onPress={() => setShowProfile(true)}
           >
             <Text style={styles.linkButtonText}>Native Profile</Text>
           </TouchableOpacity>
@@ -174,14 +100,20 @@ export default function MainScreen() {
 
         <TouchableOpacity
           style={[styles.linkButton, styles.signOutButton]}
-          onPress={async () => {
-            await ClerkExpo.signOut();
-            await signOut();
-          }}
+          onPress={() => signOut()}
         >
           <Text style={styles.linkButtonText}>Sign Out</Text>
         </TouchableOpacity>
       </View>
+
+      {showProfile && (
+        <UserProfileView
+          onDismiss={() => setShowProfile(false)}
+          onSignOut={async () => {
+            await signOut();
+          }}
+        />
+      )}
     </ScrollView>
   );
 }
@@ -197,22 +129,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
   },
-  signedOutContainer: {
+  landingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
     padding: 40,
-    gap: 12,
   },
-  appTitle: {
+  landingTitle: {
     fontSize: 32,
     fontWeight: "bold",
     color: "#1a1a1a",
+    marginBottom: 8,
   },
-  appSubtitle: {
+  landingSubtitle: {
     fontSize: 16,
     color: "#666",
-    marginBottom: 32,
+    marginBottom: 40,
   },
   signInButton: {
     backgroundColor: "#007AFF",
