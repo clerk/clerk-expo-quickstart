@@ -11,21 +11,13 @@ import {
   Platform,
   ScrollView,
   ActivityIndicator,
-  Modal,
-  SafeAreaView,
 } from "react-native";
-import GoogleSignInButton from "@/app/components/GoogleSignInButton";
-import AppleSignInButton from "@/app/components/AppleSignInButton";
-import { isNativeModuleAvailable } from "@/app/components/NativeModuleGuard";
-
-type NativeAuthMode = false | "inline" | "modal";
 
 export default function SignInScreen() {
   const { signIn, errors, fetchStatus } = useSignIn();
 
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
-  const [nativeAuthMode, setNativeAuthMode] = useState<NativeAuthMode>(false);
 
   const isLoading = fetchStatus === "fetching";
 
@@ -41,8 +33,6 @@ export default function SignInScreen() {
       if (result.error) return;
 
       if (signIn.status === "complete") {
-        // finalize sets the active session; the (auth) layout will
-        // reactively redirect to /(home) once isSignedIn becomes true.
         await signIn.finalize();
       } else if (signIn.status === "needs_second_factor") {
         alert(
@@ -52,70 +42,6 @@ export default function SignInScreen() {
     } catch (error) {
       console.error("[SignIn] error:", error);
     }
-  };
-
-  const clearNativeSession = async () => {
-    try {
-      const { requireNativeModule } = require("expo-modules-core");
-      const ClerkExpo = requireNativeModule("ClerkExpo");
-      await ClerkExpo.signOut();
-    } catch (e) {
-      // ignore
-    }
-  };
-
-  // Show native AuthView embedded in the view (not a modal)
-  if (nativeAuthMode === "inline") {
-    const { AuthView } = require("@clerk/expo/native");
-    return (
-      <AuthView
-        presentation="inline"
-        mode="signIn"
-        isDismissable={false}
-        style={styles.container}
-        onSuccess={() => setNativeAuthMode(false)}
-        onError={(error: any) => {
-          console.error("Native auth error:", error);
-          setNativeAuthMode(false);
-        }}
-      />
-    );
-  }
-
-  const hasNativeModules = isNativeModuleAvailable();
-
-  // Lazy-require AuthView for modal usage (wrapped in RN Modal)
-  const NativeModalAuth = () => {
-    const { AuthView } = require("@clerk/expo/native");
-    return (
-      <Modal
-        visible={nativeAuthMode === "modal"}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={() => setNativeAuthMode(false)}
-      >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setNativeAuthMode(false)}>
-              <Text style={styles.modalCloseButton}>Close</Text>
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Native Sign In (Modal)</Text>
-            <View style={{ width: 50 }} />
-          </View>
-          <AuthView
-            presentation="inline"
-            mode="signIn"
-            isDismissable={false}
-            style={{ flex: 1 }}
-            onSuccess={() => setNativeAuthMode(false)}
-            onError={(error: any) => {
-              console.error("Native auth error:", error);
-              setNativeAuthMode(false);
-            }}
-          />
-        </SafeAreaView>
-      </Modal>
-    );
   };
 
   return (
@@ -132,46 +58,6 @@ export default function SignInScreen() {
           <Text style={styles.subtitle}>Sign in to your account</Text>
         </View>
 
-        {/* Native Auth Buttons */}
-        {hasNativeModules && (
-          <View style={styles.nativeAuthButtons}>
-            <TouchableOpacity
-              style={styles.nativeAuthButton}
-              onPress={async () => {
-                await clearNativeSession();
-                setNativeAuthMode("inline");
-              }}
-            >
-              <Text style={styles.nativeAuthButtonText}>
-                Native Sign In (Inline)
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.nativeAuthButton, styles.nativeAuthButtonModal]}
-              onPress={async () => {
-                await clearNativeSession();
-                setNativeAuthMode("modal");
-              }}
-            >
-              <Text style={styles.nativeAuthButtonText}>
-                Native Sign In (Modal)
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Native OAuth Buttons */}
-        <View style={styles.oauthSection}>
-          <AppleSignInButton showDivider={false} />
-          <GoogleSignInButton showDivider={false} />
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or continue with email</Text>
-            <View style={styles.dividerLine} />
-          </View>
-        </View>
-
-        {/* Email/Password Form */}
         <View style={styles.form}>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Email</Text>
@@ -217,7 +103,6 @@ export default function SignInScreen() {
             )}
           </View>
 
-          {/* Global errors */}
           {errors.global && errors.global.length > 0 && (
             <View style={styles.globalError}>
               {errors.global.map((err, idx) => (
@@ -250,7 +135,6 @@ export default function SignInScreen() {
           </Link>
         </View>
       </ScrollView>
-      {hasNativeModules && <NativeModalAuth />}
     </KeyboardAvoidingView>
   );
 }
@@ -277,24 +161,6 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: "#666",
-  },
-  oauthSection: {
-    marginBottom: 24,
-  },
-  divider: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 20,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#e0e0e0",
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    color: "#666",
-    fontSize: 14,
   },
   form: {
     gap: 16,
@@ -358,46 +224,5 @@ const styles = StyleSheet.create({
     color: "#FF0000",
     fontSize: 14,
     fontWeight: "600",
-  },
-  nativeAuthButtons: {
-    gap: 12,
-    marginBottom: 24,
-  },
-  nativeAuthButton: {
-    backgroundColor: "#34C759",
-    padding: 16,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  nativeAuthButtonModal: {
-    backgroundColor: "#007AFF",
-  },
-  nativeAuthButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  modalHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  modalCloseButton: {
-    fontSize: 16,
-    color: "#007AFF",
-    width: 50,
-  },
-  modalTitle: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#1a1a1a",
   },
 });

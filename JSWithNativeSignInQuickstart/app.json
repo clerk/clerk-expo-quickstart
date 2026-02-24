@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "clerk-expo-quickstart",
-    "slug": "clerk-expo-quickstart",
+    "name": "clerk-js-oauth-quickstart",
+    "slug": "clerk-js-oauth-quickstart",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -14,14 +14,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.clerk-expo-quickstart"
+      "bundleIdentifier": "com.yourcompany.yourapp"
     },
     "android": {
-      "package": "com.clerk.clerkexpoquickstart",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.yourcompany.yourapp"
     },
     "web": {
       "bundler": "metro",
@@ -29,23 +29,11 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "@clerk/clerk-expo/app.plugin",
       "expo-router",
       "expo-secure-store",
       "expo-font",
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "compileSdkVersion": 35,
-            "targetSdkVersion": 35,
-            "buildToolsVersion": "35.0.0"
-          },
-          "ios": {
-            "deploymentTarget": "17.0"
-          }
-        }
-      ]
+      "expo-apple-authentication",
+      "@clerk/expo"
     ],
     "experiments": {
       "typedRoutes": true

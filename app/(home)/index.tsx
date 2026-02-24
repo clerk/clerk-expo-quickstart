@@ -1,4 +1,5 @@
-import { useAuth, useUser, useClerk } from "@clerk/expo";
+import { useAuth, useUser, useClerk, RedirectToTasks } from "@clerk/expo";
+import { useState } from "react";
 import { Link, useRouter } from "expo-router";
 import {
   Text,
@@ -23,6 +24,32 @@ function isNativeModuleAvailable(): boolean {
   } catch {
     return false;
   }
+}
+
+function RedirectToTasksTest() {
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+  console.log("[RedirectToTasksTest] shouldRedirect:", shouldRedirect);
+  return (
+    <View>
+      <TouchableOpacity
+        style={{
+          backgroundColor: "#6C47FF",
+          padding: 16,
+          borderRadius: 12,
+          alignItems: "center",
+        }}
+        onPress={() => {
+          console.log("[RedirectToTasksTest] Button pressed!");
+          setShouldRedirect(true);
+        }}
+      >
+        <Text style={{ color: "#fff", fontSize: 16, fontWeight: "600" }}>
+          Redirect to Tasks
+        </Text>
+      </TouchableOpacity>
+      {shouldRedirect && <RedirectToTasks />}
+    </View>
+  );
 }
 
 /**
@@ -141,6 +168,8 @@ export default function HomePage() {
               </View>
             )}
           </View>
+
+          <RedirectToTasksTest />
 
           <TouchableOpacity
             style={[styles.button, styles.signOutButton]}

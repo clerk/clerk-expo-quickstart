@@ -3,8 +3,8 @@ import "dotenv/config";
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: process.env.APP_NAME || "clerk-expo-quickstart",
-  slug: process.env.APP_SLUG || "clerk-expo-quickstart",
+  name: process.env.APP_NAME || "clerk-native-quickstart",
+  slug: process.env.APP_SLUG || "clerk-native-quickstart",
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/images/icon.png",
@@ -18,8 +18,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier:
-      process.env.EXPO_PUBLIC_IOS_BUNDLE_IDENTIFIER ||
-      "com.yourcompany.yourapp",
+      process.env.IOS_BUNDLE_IDENTIFIER || "com.yourcompany.yourapp",
     ...(process.env.APPLE_TEAM_ID && {
       appleTeamId: process.env.APPLE_TEAM_ID,
     }),
@@ -32,8 +31,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       foregroundImage: "./assets/images/adaptive-icon.png",
       backgroundColor: "#ffffff",
     },
-    package:
-      process.env.ANDROID_PACKAGE || "com.yourcompany.yourapp",
+    package: process.env.ANDROID_PACKAGE || "com.yourcompany.yourapp",
   },
   web: {
     bundler: "metro",
@@ -44,7 +42,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-router",
     "expo-secure-store",
     "expo-font",
-    "expo-apple-authentication",
     "@clerk/expo",
   ],
   experiments: {
@@ -53,7 +50,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   extra: {
     router: {},
     eas: {
-      projectId: process.env.EXPO_PUBLIC_EAS_PROJECT_ID || "Your Project ID",
+      projectId: process.env.EAS_PROJECT_ID || "Your Project ID",
     },
     EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME:
       process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME,
