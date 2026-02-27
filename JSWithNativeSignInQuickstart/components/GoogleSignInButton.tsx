@@ -1,4 +1,4 @@
-import { useSignInWithGoogle } from '@clerk/expo'
+import { useSignInWithGoogle } from '@clerk/expo/google'
 import { useRouter } from 'expo-router'
 import { Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
