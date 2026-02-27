@@ -1,260 +1,253 @@
-import { useSignIn } from "@clerk/expo";
-import { Link } from "expo-router";
-import { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  ActivityIndicator,
-} from "react-native";
-import GoogleSignInButton from "@/app/components/GoogleSignInButton";
-import AppleSignInButton from "@/app/components/AppleSignInButton";
+import { ThemedText } from '@/components/themed-text'
+import { ThemedView } from '@/components/themed-view'
+import { GoogleSignInButton } from '@/components/GoogleSignInButton'
+import { AppleSignInButton } from '@/app/components/AppleSignInButton'
+import { useSignIn } from '@clerk/expo'
+import { type Href, Link, useRouter } from 'expo-router'
+import React from 'react'
+import { Pressable, StyleSheet, TextInput, View } from 'react-native'
 
-export default function SignInScreen() {
-  const { signIn, errors, fetchStatus } = useSignIn();
+export default function Page() {
+  const { signIn, errors, fetchStatus } = useSignIn()
+  const router = useRouter()
 
-  const [emailAddress, setEmailAddress] = useState("");
-  const [password, setPassword] = useState("");
+  const [emailAddress, setEmailAddress] = React.useState('')
+  const [password, setPassword] = React.useState('')
+  const [code, setCode] = React.useState('')
 
-  const isLoading = fetchStatus === "fetching";
-
-  const handleSignIn = async () => {
-    if (!signIn) return;
-
-    try {
-      const result = await signIn.password({
-        identifier: emailAddress,
-        password: password,
-      });
-
-      if (result.error) return;
-
-      if (signIn.status === "complete") {
-        await signIn.finalize();
-      } else if (signIn.status === "needs_second_factor") {
-        alert(
-          "This account requires two-factor authentication. MFA flow not implemented in this demo."
-        );
-      }
-    } catch (error) {
-      console.error("[SignIn] error:", error);
+  const handleSubmit = async () => {
+    const { error } = await signIn.password({
+      emailAddress,
+      password,
+    })
+    if (error) {
+      console.error(JSON.stringify(error, null, 2))
+      return
     }
-  };
+
+    if (signIn.status === 'complete') {
+      await signIn.finalize({
+        navigate: ({ session, decorateUrl }) => {
+          if (session?.currentTask) {
+            // Handle pending session tasks
+            // See https://clerk.com/docs/guides/development/custom-flows/authentication/session-tasks
+            console.log(session?.currentTask)
+            return
+          }
+
+          const url = decorateUrl('/')
+          if (url.startsWith('http')) {
+            window.location.href = url
+          } else {
+            router.push(url as Href)
+          }
+        },
+      })
+    } else if (signIn.status === 'needs_second_factor') {
+      // See https://clerk.com/docs/guides/development/custom-flows/authentication/multi-factor-authentication
+    } else if (signIn.status === 'needs_client_trust') {
+      // For other second factor strategies,
+      // see https://clerk.com/docs/guides/development/custom-flows/authentication/client-trust
+      const emailCodeFactor = signIn.supportedSecondFactors.find(
+        (factor): factor is EmailCodeFactor => factor.strategy === 'email_code',
+      )
+
+      if (emailCodeFactor) {
+        await signIn.mfa.sendEmailCode()
+      }
+    } else {
+      // Check why the sign-in is not complete
+      console.error('Sign-in attempt not complete:', signIn)
+    }
+  }
+
+  const handleVerify = async () => {
+    await signIn.mfa.verifyEmailCode({ code })
+
+    if (signIn.status === 'complete') {
+      await signIn.finalize({
+        navigate: ({ session, decorateUrl }) => {
+          if (session?.currentTask) {
+            // Handle pending session tasks
+            // See https://clerk.com/docs/guides/development/custom-flows/authentication/session-tasks
+            console.log(session?.currentTask)
+            return
+          }
+
+          const url = decorateUrl('/')
+          if (url.startsWith('http')) {
+            window.location.href = url
+          } else {
+            router.push(url as Href)
+          }
+        },
+      })
+    } else {
+      // Check why the sign-in is not complete
+      console.error('Sign-in attempt not complete:', signIn)
+    }
+  }
+
+  if (signIn.status === 'needs_client_trust') {
+    return (
+      <ThemedView style={styles.container}>
+        <ThemedText type="title" style={styles.title}>
+          Verify your account
+        </ThemedText>
+        <TextInput
+          style={styles.input}
+          value={code}
+          placeholder="Enter your verification code"
+          placeholderTextColor="#666666"
+          onChangeText={(code) => setCode(code)}
+          keyboardType="numeric"
+        />
+        {errors.fields.code && (
+          <ThemedText style={styles.error}>{errors.fields.code.message}</ThemedText>
+        )}
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            fetchStatus === 'fetching' && styles.buttonDisabled,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={handleVerify}
+          disabled={fetchStatus === 'fetching'}
+        >
+          <ThemedText style={styles.buttonText}>Verify</ThemedText>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
+          onPress={() => signIn.mfa.sendEmailCode()}
+        >
+          <ThemedText style={styles.secondaryButtonText}>I need a new code</ThemedText>
+        </Pressable>
+      </ThemedView>
+    )
+  }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
+    <ThemedView style={styles.container}>
+      <ThemedText type="title" style={styles.title}>
+        Sign in
+      </ThemedText>
+
+      <AppleSignInButton />
+      <GoogleSignInButton />
+
+      <ThemedText style={styles.label}>Email address</ThemedText>
+      <TextInput
+        style={styles.input}
+        autoCapitalize="none"
+        value={emailAddress}
+        placeholder="Enter email"
+        placeholderTextColor="#666666"
+        onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
+        keyboardType="email-address"
+      />
+      {errors.fields.identifier && (
+        <ThemedText style={styles.error}>{errors.fields.identifier.message}</ThemedText>
+      )}
+      <ThemedText style={styles.label}>Password</ThemedText>
+      <TextInput
+        style={styles.input}
+        value={password}
+        placeholder="Enter password"
+        placeholderTextColor="#666666"
+        secureTextEntry={true}
+        onChangeText={(password) => setPassword(password)}
+      />
+      {errors.fields.password && (
+        <ThemedText style={styles.error}>{errors.fields.password.message}</ThemedText>
+      )}
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          (!emailAddress || !password || fetchStatus === 'fetching') && styles.buttonDisabled,
+          pressed && styles.buttonPressed,
+        ]}
+        onPress={handleSubmit}
+        disabled={!emailAddress || !password || fetchStatus === 'fetching'}
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>Welcome Back</Text>
-          <Text style={styles.subtitle}>Sign in to your account</Text>
-        </View>
+        <ThemedText style={styles.buttonText}>Continue</ThemedText>
+      </Pressable>
+      {/* For your debugging purposes. You can just console.log errors, but we put them in the UI for convenience */}
+      {errors && <ThemedText style={styles.debug}>{JSON.stringify(errors, null, 2)}</ThemedText>}
 
-        {/* OAuth Buttons */}
-        <View style={styles.oauthSection}>
-          <AppleSignInButton showDivider={false} />
-          <GoogleSignInButton showDivider={false} />
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or continue with email</Text>
-            <View style={styles.dividerLine} />
-          </View>
-        </View>
-
-        {/* Email/Password Form */}
-        <View style={styles.form}>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={[
-                styles.input,
-                errors.fields.identifier && styles.inputError,
-              ]}
-              placeholder="Enter your email"
-              placeholderTextColor="#999"
-              value={emailAddress}
-              onChangeText={setEmailAddress}
-              autoCapitalize="none"
-              autoComplete="email"
-              keyboardType="email-address"
-              editable={!isLoading}
-            />
-            {errors.fields.identifier && (
-              <Text style={styles.errorText}>
-                {errors.fields.identifier.message}
-              </Text>
-            )}
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={[
-                styles.input,
-                errors.fields.password && styles.inputError,
-              ]}
-              placeholder="Enter your password"
-              placeholderTextColor="#999"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              editable={!isLoading}
-            />
-            {errors.fields.password && (
-              <Text style={styles.errorText}>
-                {errors.fields.password.message}
-              </Text>
-            )}
-          </View>
-
-          {errors.global && errors.global.length > 0 && (
-            <View style={styles.globalError}>
-              {errors.global.map((err, idx) => (
-                <Text key={idx} style={styles.errorText}>
-                  {err.message}
-                </Text>
-              ))}
-            </View>
-          )}
-
-          <TouchableOpacity
-            style={[styles.button, isLoading && styles.buttonDisabled]}
-            onPress={handleSignIn}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Sign In</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Don't have an account? </Text>
-          <Link href="/(auth)/sign-up" asChild>
-            <TouchableOpacity>
-              <Text style={styles.linkText}>Sign Up</Text>
-            </TouchableOpacity>
-          </Link>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  );
+      <View style={styles.linkContainer}>
+        <ThemedText>Don't have an account? </ThemedText>
+        <Link href="/sign-up">
+          <ThemedText type="link">Sign up</ThemedText>
+        </Link>
+      </View>
+    </ThemedView>
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 24,
-    paddingTop: 60,
-  },
-  header: {
-    marginBottom: 32,
+    padding: 20,
+    gap: 12,
   },
   title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#1a1a1a",
     marginBottom: 8,
   },
-  subtitle: {
-    fontSize: 16,
-    color: "#666",
-  },
-  oauthSection: {
-    marginBottom: 24,
-  },
-  divider: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 20,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#e0e0e0",
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    color: "#666",
-    fontSize: 14,
-  },
-  form: {
-    gap: 16,
-  },
-  inputContainer: {
-    gap: 8,
-  },
   label: {
+    fontWeight: '600',
     fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    backgroundColor: "#f8f9fa",
-  },
-  inputError: {
-    borderColor: "#dc3545",
-    backgroundColor: "#fff5f5",
-  },
-  errorText: {
-    color: "#dc3545",
-    fontSize: 13,
-  },
-  globalError: {
-    padding: 12,
-    backgroundColor: "#fff5f5",
+    borderColor: '#ccc',
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#dc3545",
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: '#fff',
   },
   button: {
-    backgroundColor: "#FF0000",
-    padding: 16,
-    borderRadius: 12,
-    alignItems: "center",
+    backgroundColor: '#0a7ea4',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
     marginTop: 8,
   },
+  buttonPressed: {
+    opacity: 0.7,
+  },
   buttonDisabled: {
-    backgroundColor: "#ffaaaa",
+    opacity: 0.5,
   },
   buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
+    color: '#fff',
+    fontWeight: '600',
   },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 32,
+  secondaryButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
   },
-  footerText: {
-    color: "#666",
-    fontSize: 14,
+  secondaryButtonText: {
+    color: '#0a7ea4',
+    fontWeight: '600',
   },
-  linkText: {
-    color: "#FF0000",
-    fontSize: 14,
-    fontWeight: "600",
+  linkContainer: {
+    flexDirection: 'row',
+    gap: 4,
+    marginTop: 12,
+    alignItems: 'center',
   },
-});
+  error: {
+    color: '#d32f2f',
+    fontSize: 12,
+    marginTop: -8,
+  },
+  debug: {
+    fontSize: 10,
+    opacity: 0.5,
+    marginTop: 8,
+  },
+})

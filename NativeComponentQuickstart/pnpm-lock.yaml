@@ -4,13 +4,16 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@clerk/clerk-js': 6.0.0-snapshot.v20260224223518
+
 importers:
 
   .:
     dependencies:
       '@clerk/expo':
-        specifier: 3.0.0-local.v20260223215903
-        version: 3.0.0-local.v20260223215903(m2zbrh3bohqctaujypqfm3j2ky)
+        specifier: 3.0.0-snapshot.v20260224223518
+        version: 3.0.0-snapshot.v20260224223518(tjmhqav2jfgmsn4tqzmgcwwkeq)
       '@expo/vector-icons':
         specifier: ^15.0.3
         version: 15.1.1(expo-font@14.0.11(expo@54.0.25(@babel/core@7.29.0)(@expo/metro-runtime@6.1.2)(bufferutil@4.1.0)(expo-router@6.0.23)(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)(utf-8-validate@5.0.10))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)
@@ -80,6 +83,9 @@ importers:
       react-native-web:
         specifier: ^0.21.2
         version: 0.21.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      whatwg-fetch:
+        specifier: ^3.6.20
+        version: 3.6.20
     devDependencies:
       '@babel/core':
         specifier: ^7.29.0
@@ -607,22 +613,21 @@ packages:
   '@base-org/account@2.0.1':
     resolution: {integrity: sha512-tySVNx+vd6XEynZL0uvB10uKiwnAfThr8AbKTwILVG86mPbLAhEOInQIk+uDnvpTvfdUhC1Bi5T/46JvFoLZQQ==}
 
-  '@clerk/clerk-js@6.0.0-local.v20260223215903':
-    resolution: {integrity: sha512-hb1HbUJ4r2kVx1yyPY45b8b061O0PyiA+FCqJAOuvLc+4ChV+LDu5HqcEbDFlgsIpabCrgphGiWsJp8PBOb0PQ==}
+  '@clerk/clerk-js@6.0.0-snapshot.v20260224223518':
+    resolution: {integrity: sha512-FdKLXhSTOgiiRgX5wxFpWehAf8kgb46BMmDq6TavXeGtD8xNWXaKt492apOBjcullndA/WapO2AF7eHErMEcFA==}
     engines: {node: '>=20.9.0'}
 
-  '@clerk/expo@3.0.0-local.v20260223215903':
-    resolution: {integrity: sha512-Oi0Ao2v9ndBzKyptcW6tWtnMY19s7Ju0ogLOluGKSgZwmUfq6JocPceIr0NCPFkAJcclhYlsK4NfRecKhaD3AQ==}
+  '@clerk/expo@3.0.0-snapshot.v20260224223518':
+    resolution: {integrity: sha512-gH8XldhkS9pgvowKskB9h4zLrgV2bqK+JYrSD2uRRg4SOia0a5vkCKxKSJvxk1AKX5L9vN/A6kxv/qHrdP3juw==}
     engines: {node: '>=20.9.0'}
     peerDependencies:
-      '@clerk/expo-passkeys': 1.0.0-local.v20260223215903
+      '@clerk/expo-passkeys': 1.0.0-snapshot.v20260224223518
       expo: '>=53 <55'
       expo-apple-authentication: '>=7.0.0'
       expo-auth-session: '>=5'
       expo-constants: '>=12'
       expo-crypto: '>=12'
       expo-local-authentication: '>=13.5.0'
-      expo-modules-core: '>=3.0.0'
       expo-secure-store: '>=12.4.0'
       expo-web-browser: '>=12.5.0'
       react: ^18.0.0 || ^19.0.0
@@ -642,15 +647,15 @@ packages:
       expo-secure-store:
         optional: true
 
-  '@clerk/react@6.0.0-local.v20260223215903':
-    resolution: {integrity: sha512-iXMkqLlWF/qRBzVy/sYI8KMRCYkrk3g/3MVlpd52D9jeqaJa0y4mg9VshbtAzEp+Yk4xxJPyhIgRb8f22tVlRQ==}
+  '@clerk/react@6.0.0-snapshot.v20260224223518':
+    resolution: {integrity: sha512-S3dWPV1ImCMOZe/ck73RB8TWynQwTY8teW2vh19hSvRv3dSOhvbxajjknRMOPJYPg7SZJv+yjsEh2MJx+ewRmQ==}
     engines: {node: '>=20.9.0'}
     peerDependencies:
       react: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
       react-dom: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
 
-  '@clerk/shared@4.0.0-local.v20260223215903':
-    resolution: {integrity: sha512-sW+KYYhu1CWaolCT7o0A+iK1+hUk7iiTpGNLSb/B+MeHLAezMJ917f9patJB9eeRv9DBzUVMVghqVZeLqeWLkg==}
+  '@clerk/shared@4.0.0-snapshot.v20260224223518':
+    resolution: {integrity: sha512-sGeF2u8mtZ35CcV+xKx37eORnriUIk3j/xhc7mba6CdKMgKKdpdBCU2gJawFS/y36YwxdvzuJGqLeSFhBymA/g==}
     engines: {node: '>=20.9.0'}
     peerDependencies:
       react: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
@@ -3754,8 +3759,8 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc
 
-  viem@2.46.2:
-    resolution: {integrity: sha512-w8Qv5Vyo7TfXcH3vgmxRa1NRvzJCDy2aSGSRsJn3503nC/qVbgEQ+n3aj/CkqWXbloudZh97h5o5aQrQSVGy0w==}
+  viem@2.46.3:
+    resolution: {integrity: sha512-2LJS+Hyh2sYjHXQtzfv1kU9pZx9dxFzvoU/ZKIcn0FNtOU0HQuIICuYdWtUDFHaGXbAdVo8J1eCvmjkL9JVGwg==}
     peerDependencies:
       typescript: '>=5.0.4'
     peerDependenciesMeta:
@@ -4568,7 +4573,7 @@ snapshots:
       idb-keyval: 6.2.1
       ox: 0.6.9(typescript@5.9.3)(zod@3.25.76)
       preact: 10.24.2
-      viem: 2.46.2(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)
+      viem: 2.46.3(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)
       zustand: 5.0.3(@types/react@19.1.17)(react@19.1.0)(use-sync-external-store@1.6.0(react@19.1.0))
     transitivePeerDependencies:
       - '@types/react'
@@ -4580,10 +4585,10 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@clerk/clerk-js@6.0.0-local.v20260223215903(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10))(@types/react@19.1.17)(bs58@5.0.0)(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@19.1.0(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.1.0))(utf-8-validate@5.0.10)(zod@3.25.76)':
+  '@clerk/clerk-js@6.0.0-snapshot.v20260224223518(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10))(@types/react@19.1.17)(bs58@5.0.0)(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@19.1.0(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.1.0))(utf-8-validate@5.0.10)(zod@3.25.76)':
     dependencies:
       '@base-org/account': 2.0.1(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.1.0))(utf-8-validate@5.0.10)(zod@3.25.76)
-      '@clerk/shared': 4.0.0-local.v20260223215903(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@clerk/shared': 4.0.0-snapshot.v20260224223518(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@coinbase/wallet-sdk': 4.3.0
       '@solana/wallet-adapter-base': 0.9.27(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10))
       '@solana/wallet-adapter-react': 0.15.39(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10))(bs58@5.0.0)(fastestsmallesttextencoderdecoder@1.0.22)(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)(typescript@5.9.3)
@@ -4614,15 +4619,14 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@clerk/expo@3.0.0-local.v20260223215903(m2zbrh3bohqctaujypqfm3j2ky)':
+  '@clerk/expo@3.0.0-snapshot.v20260224223518(tjmhqav2jfgmsn4tqzmgcwwkeq)':
     dependencies:
-      '@clerk/clerk-js': 6.0.0-local.v20260223215903(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10))(@types/react@19.1.17)(bs58@5.0.0)(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@19.1.0(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.1.0))(utf-8-validate@5.0.10)(zod@3.25.76)
-      '@clerk/react': 6.0.0-local.v20260223215903(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@clerk/shared': 4.0.0-local.v20260223215903(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@clerk/clerk-js': 6.0.0-snapshot.v20260224223518(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10))(@types/react@19.1.17)(bs58@5.0.0)(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@19.1.0(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.1.0))(utf-8-validate@5.0.10)(zod@3.25.76)
+      '@clerk/react': 6.0.0-snapshot.v20260224223518(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@clerk/shared': 4.0.0-snapshot.v20260224223518(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       base-64: 1.0.0
       expo: 54.0.25(@babel/core@7.29.0)(@expo/metro-runtime@6.1.2)(bufferutil@4.1.0)(expo-router@6.0.23)(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)(utf-8-validate@5.0.10)
       expo-auth-session: 7.0.10(expo@54.0.25(@babel/core@7.29.0)(@expo/metro-runtime@6.1.2)(bufferutil@4.1.0)(expo-router@6.0.23)(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)(utf-8-validate@5.0.10))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)
-      expo-modules-core: 3.0.26(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)
       expo-web-browser: 15.0.10(expo@54.0.25(@babel/core@7.29.0)(@expo/metro-runtime@6.1.2)(bufferutil@4.1.0)(expo-router@6.0.23)(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)(utf-8-validate@5.0.10))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@5.0.10))
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
@@ -4645,14 +4649,14 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@clerk/react@6.0.0-local.v20260223215903(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@clerk/react@6.0.0-snapshot.v20260224223518(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
-      '@clerk/shared': 4.0.0-local.v20260223215903(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@clerk/shared': 4.0.0-snapshot.v20260224223518(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
       tslib: 2.8.1
 
-  '@clerk/shared@4.0.0-local.v20260223215903(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@clerk/shared@4.0.0-snapshot.v20260224223518(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@tanstack/query-core': 5.90.16
       dequal: 2.0.3
@@ -8346,7 +8350,7 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  viem@2.46.2(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76):
+  viem@2.46.3(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76):
     dependencies:
       '@noble/curves': 1.9.1
       '@noble/hashes': 1.8.0
