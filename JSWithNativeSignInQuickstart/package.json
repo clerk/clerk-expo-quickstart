@@ -10,7 +10,8 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@clerk/expo": "3.0.0-local.v20260220190352",
+    "@babel/runtime": "^7.28.6",
+    "@clerk/expo": "3.0.0-snapshot.v20260227195620",
     "expo": "54.0.25",
     "expo-apple-authentication": "~8.0.8",
     "expo-auth-session": "~7.0.10",

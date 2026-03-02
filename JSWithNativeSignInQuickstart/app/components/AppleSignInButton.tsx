@@ -1,18 +1,38 @@
 import { useSignInWithApple } from '@clerk/expo/apple'
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native'
+import { useSSO } from '@clerk/expo'
+import { useRouter } from 'expo-router'
+import { Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native'
 
 export function AppleSignInButton({ onSignInComplete }: { onSignInComplete?: () => void }) {
-  const { signInWithApple } = useSignInWithApple()
-
-  // Only show on iOS
-  if (Platform.OS !== 'ios') return null
+  const { startAppleAuthenticationFlow } = useSignInWithApple()
+  const { startSSOFlow } = useSSO()
+  const router = useRouter()
 
   const handleAppleSignIn = async () => {
     try {
-      await signInWithApple()
-      onSignInComplete?.()
+      if (Platform.OS === 'ios') {
+        // Native Apple Sign-In on iOS
+        const { createdSessionId, setActive } = await startAppleAuthenticationFlow()
+
+        if (createdSessionId && setActive) {
+          await setActive({ session: createdSessionId })
+          onSignInComplete?.() ?? router.replace('/')
+        }
+      } else {
+        // Web-based OAuth Apple Sign-In on Android
+        const { createdSessionId, setActive } = await startSSOFlow({
+          strategy: 'oauth_apple',
+        })
+
+        if (createdSessionId && setActive) {
+          await setActive({ session: createdSessionId })
+          onSignInComplete?.() ?? router.replace('/')
+        }
+      }
     } catch (err: any) {
       if (err?.message?.includes('ERR_REQUEST_CANCELED')) return
+      if (err?.code === 'ERR_CANCELED') return
+      Alert.alert('Error', err.message || 'An error occurred during Apple Sign-In')
       console.error('Apple Sign-In error:', err)
     }
   }

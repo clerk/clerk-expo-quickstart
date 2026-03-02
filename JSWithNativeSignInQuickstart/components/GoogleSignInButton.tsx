@@ -21,7 +21,16 @@ export function GoogleSignInButton({
 
   const handleGoogleSignIn = async () => {
     try {
-      const { createdSessionId, setActive } = await startGoogleAuthenticationFlow()
+      console.log('[GoogleSignIn] Starting authentication flow...')
+      const result = await startGoogleAuthenticationFlow()
+      console.log('[GoogleSignIn] Flow result:', JSON.stringify({
+        createdSessionId: result.createdSessionId,
+        hasSetActive: !!result.setActive,
+        signInStatus: result.signIn?.status,
+        signUpStatus: result.signUp?.status,
+      }, null, 2))
+
+      const { createdSessionId, setActive } = result
 
       if (createdSessionId && setActive) {
         await setActive({ session: createdSessionId })
@@ -31,6 +40,8 @@ export function GoogleSignInButton({
         } else {
           router.replace('/')
         }
+      } else {
+        console.warn('[GoogleSignIn] No createdSessionId returned. Full result:', JSON.stringify(result, null, 2))
       }
     } catch (err: any) {
       if (err.code === 'SIGN_IN_CANCELLED' || err.code === '-5') {
