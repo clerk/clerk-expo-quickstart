@@ -34,6 +34,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 8,
     alignItems: 'center',
+    marginTop: 8,
   },
   buttonPressed: {
     opacity: 0.7,
