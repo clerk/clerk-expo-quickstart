@@ -1,7 +1,7 @@
 import { SignOutButton } from '@/components/sign-out-button'
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
-import { SignedIn, SignedOut, useSession, useUser } from '@clerk/clerk-expo'
+import { SignedIn, SignedOut, useSession, useUser } from '@clerk/expo'
 import { Link } from 'expo-router'
 import { StyleSheet } from 'react-native'
 

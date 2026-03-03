@@ -1,5 +1,5 @@
 import { ThemedText } from '@/components/themed-text'
-import { useClerk } from '@clerk/clerk-expo'
+import { useClerk } from '@clerk/expo'
 import { useRouter } from 'expo-router'
 import { Pressable, StyleSheet } from 'react-native'
 
