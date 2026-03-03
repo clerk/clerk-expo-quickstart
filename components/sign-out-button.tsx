@@ -1,5 +1,5 @@
 import { ThemedText } from '@/components/themed-text'
-import { useClerk } from '@clerk/clerk-expo'
+import { useClerk } from '@clerk/expo'
 import { useRouter } from 'expo-router'
 import { Pressable, StyleSheet } from 'react-native'
 
@@ -34,6 +34,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 8,
     alignItems: 'center',
+    marginTop: 8,
   },
   buttonPressed: {
     opacity: 0.7,
