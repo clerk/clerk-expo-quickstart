@@ -41,3 +41,13 @@ app-example
 # generated native folders
 /ios
 /android
+ios/
+android/
+
+# metro
+metro.config.js
+
+# artifacts
+*.ipa
+*.apk
+*.aab

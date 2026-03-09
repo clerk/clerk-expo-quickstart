@@ -1,0 +1,11 @@
+# Claude Code Rules for clerk-expo-quickstart
+
+## Git Usage
+- **NEVER** use git commands in any form
+- User manages git themselves
+- Do not commit, stash, check status, or perform any git operations
+
+## Development Workflow
+- Only use `pnpm start` for development server
+- Use `npx expo prebuild` when native changes are needed
+- Use `npx react-native run-ios` for iOS builds
