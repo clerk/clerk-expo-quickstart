@@ -43,14 +43,12 @@ export default function Page() {
           }
         },
       })
-    } else if (signIn.status === 'needs_second_factor' || signIn.status === 'needs_client_trust') {
-      // Handle second factor or client trust verification
+    } else if (signIn.status === 'needs_second_factor') {
+      // See https://clerk.com/docs/guides/development/custom-flows/authentication/multi-factor-authentication
+    } else if (signIn.status === 'needs_client_trust') {
       // For other second factor strategies,
-      // see https://clerk.com/docs/guides/development/custom-flows/authentication/multi-factor-authentication
       // see https://clerk.com/docs/guides/development/custom-flows/authentication/client-trust
-      const emailCodeFactor = signIn.supportedSecondFactors.find(
-        (factor): factor is EmailCodeFactor => factor.strategy === 'email_code',
-      )
+      const emailCodeFactor = signIn.supportedSecondFactors.find((factor) => factor.strategy === 'email_code')
 
       if (emailCodeFactor) {
         await signIn.mfa.sendEmailCode()
@@ -88,12 +86,10 @@ export default function Page() {
     }
   }
 
-  if (signIn.status === 'needs_second_factor' || signIn.status === 'needs_client_trust') {
+  if (signIn.status === 'needs_client_trust') {
     return (
-      <ThemedView style={styles.container}>
-        <ThemedText type="title" style={styles.title}>
-          Verify your account
-        </ThemedText>
+      <View style={styles.container}>
+        <ThemedText type="title" style={[styles.title, { fontSize: 24, fontWeight: 'bold' }]}>Verify your account</ThemedText>
         <TextInput
           style={styles.input}
           value={code}
@@ -102,9 +98,7 @@ export default function Page() {
           onChangeText={(code) => setCode(code)}
           keyboardType="numeric"
         />
-        {errors.fields.code && (
-          <ThemedText style={styles.error}>{errors.fields.code.message}</ThemedText>
-        )}
+        {errors.fields.code && <ThemedText style={styles.error}>{errors.fields.code.message}</ThemedText>}
         <Pressable
           style={({ pressed }) => [
             styles.button,
@@ -122,7 +116,13 @@ export default function Page() {
         >
           <ThemedText style={styles.secondaryButtonText}>I need a new code</ThemedText>
         </Pressable>
-      </ThemedView>
+        <Pressable
+          style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
+          onPress={() => signIn.reset()}
+        >
+          <ThemedText style={styles.secondaryButtonText}>Start over</ThemedText>
+        </Pressable>
+      </View>
     )
   }
 

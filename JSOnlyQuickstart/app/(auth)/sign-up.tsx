@@ -1,7 +1,9 @@
+import { ThemedText } from '@/components/themed-text'
+import { ThemedView } from '@/components/themed-view'
 import { useAuth, useSignUp } from '@clerk/expo'
 import { type Href, Link, useRouter } from 'expo-router'
 import React from 'react'
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Pressable, StyleSheet, TextInput, View } from 'react-native'
 
 export default function Page() {
   const { signUp, errors, fetchStatus } = useSignUp()
@@ -64,10 +66,10 @@ export default function Page() {
     signUp.missingFields.length === 0
   ) {
     return (
-      <View style={styles.container}>
-        <Text style={[styles.title, { fontSize: 24, fontWeight: 'bold' }]}>
+      <ThemedView style={styles.container}>
+        <ThemedText type="title" style={styles.title}>
           Verify your account
-        </Text>
+        </ThemedText>
         <TextInput
           style={styles.input}
           value={code}
@@ -77,7 +79,7 @@ export default function Page() {
           keyboardType="numeric"
         />
         {errors.fields.code && (
-          <Text style={styles.error}>{errors.fields.code.message}</Text>
+          <ThemedText style={styles.error}>{errors.fields.code.message}</ThemedText>
         )}
         <Pressable
           style={({ pressed }) => [
@@ -88,24 +90,25 @@ export default function Page() {
           onPress={handleVerify}
           disabled={fetchStatus === 'fetching'}
         >
-          <Text style={styles.buttonText}>Verify</Text>
+          <ThemedText style={styles.buttonText}>Verify</ThemedText>
         </Pressable>
         <Pressable
           style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
           onPress={() => signUp.verifications.sendEmailCode()}
         >
-          <Text style={styles.secondaryButtonText}>I need a new code</Text>
+          <ThemedText style={styles.secondaryButtonText}>I need a new code</ThemedText>
         </Pressable>
-      </View>
+      </ThemedView>
     )
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={[styles.title, { fontSize: 24, fontWeight: 'bold' }]}>
+    <ThemedView style={styles.container}>
+      <ThemedText type="title" style={styles.title}>
         Sign up
-      </Text>
-      <Text style={styles.label}>Email address</Text>
+      </ThemedText>
+
+      <ThemedText style={styles.label}>Email address</ThemedText>
       <TextInput
         style={styles.input}
         autoCapitalize="none"
@@ -116,9 +119,9 @@ export default function Page() {
         keyboardType="email-address"
       />
       {errors.fields.emailAddress && (
-        <Text style={styles.error}>{errors.fields.emailAddress.message}</Text>
+        <ThemedText style={styles.error}>{errors.fields.emailAddress.message}</ThemedText>
       )}
-      <Text style={styles.label}>Password</Text>
+      <ThemedText style={styles.label}>Password</ThemedText>
       <TextInput
         style={styles.input}
         value={password}
@@ -128,7 +131,7 @@ export default function Page() {
         onChangeText={(password) => setPassword(password)}
       />
       {errors.fields.password && (
-        <Text style={styles.error}>{errors.fields.password.message}</Text>
+        <ThemedText style={styles.error}>{errors.fields.password.message}</ThemedText>
       )}
       <Pressable
         style={({ pressed }) => [
@@ -139,21 +142,21 @@ export default function Page() {
         onPress={handleSubmit}
         disabled={!emailAddress || !password || fetchStatus === 'fetching'}
       >
-        <Text style={styles.buttonText}>Sign up</Text>
+        <ThemedText style={styles.buttonText}>Sign up</ThemedText>
       </Pressable>
       {/* For your debugging purposes. You can just console.log errors, but we put them in the UI for convenience */}
-      {errors && <Text style={styles.debug}>{JSON.stringify(errors, null, 2)}</Text>}
+      {errors && <ThemedText style={styles.debug}>{JSON.stringify(errors, null, 2)}</ThemedText>}
 
       <View style={styles.linkContainer}>
-        <Text>Already have an account? </Text>
+        <ThemedText>Already have an account? </ThemedText>
         <Link href="/sign-in">
-          <Text style={{ color: '#0a7ea4' }}>Sign in</Text>
+          <ThemedText type="link">Sign in</ThemedText>
         </Link>
       </View>
 
       {/* Required for sign-up flows. Clerk's bot sign-up protection is enabled by default */}
       <View nativeID="clerk-captcha" />
-    </View>
+    </ThemedView>
   )
 }
 
