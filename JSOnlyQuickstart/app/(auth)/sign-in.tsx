@@ -1,7 +1,9 @@
+import { ThemedText } from '@/components/themed-text'
+import { ThemedView } from '@/components/themed-view'
 import { useSignIn } from '@clerk/expo'
 import { type Href, Link, useRouter } from 'expo-router'
 import React from 'react'
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Pressable, StyleSheet, TextInput, View } from 'react-native'
 
 export default function Page() {
   const { signIn, errors, fetchStatus } = useSignIn()
@@ -9,6 +11,8 @@ export default function Page() {
 
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
+  const [code, setCode] = React.useState('')
+
   const handleSubmit = async () => {
     const { error } = await signIn.password({
       emailAddress,
@@ -40,19 +44,93 @@ export default function Page() {
     } else if (signIn.status === 'needs_second_factor') {
       // See https://clerk.com/docs/guides/development/custom-flows/authentication/multi-factor-authentication
     } else if (signIn.status === 'needs_client_trust') {
-      // See https://clerk.com/docs/guides/development/custom-flows/authentication/client-trust
+      // For other second factor strategies,
+      // see https://clerk.com/docs/guides/development/custom-flows/authentication/client-trust
+      const emailCodeFactor = signIn.supportedSecondFactors.find((factor) => factor.strategy === 'email_code')
+
+      if (emailCodeFactor) {
+        await signIn.mfa.sendEmailCode()
+      }
     } else {
       // Check why the sign-in is not complete
       console.error('Sign-in attempt not complete:', signIn)
     }
   }
 
+  const handleVerify = async () => {
+    await signIn.mfa.verifyEmailCode({ code })
+
+    if (signIn.status === 'complete') {
+      await signIn.finalize({
+        navigate: ({ session, decorateUrl }) => {
+          if (session?.currentTask) {
+            // Handle pending session tasks
+            // See https://clerk.com/docs/guides/development/custom-flows/authentication/session-tasks
+            console.log(session?.currentTask)
+            return
+          }
+
+          const url = decorateUrl('/')
+          if (url.startsWith('http')) {
+            window.location.href = url
+          } else {
+            router.push(url as Href)
+          }
+        },
+      })
+    } else {
+      // Check why the sign-in is not complete
+      console.error('Sign-in attempt not complete:', signIn)
+    }
+  }
+
+  if (signIn.status === 'needs_client_trust') {
+    return (
+      <ThemedView style={styles.container}>
+        <ThemedText type="title" style={[styles.title, { fontSize: 24, fontWeight: 'bold' }]}>Verify your account</ThemedText>
+        <TextInput
+          style={styles.input}
+          value={code}
+          placeholder="Enter your verification code"
+          placeholderTextColor="#666666"
+          onChangeText={(code) => setCode(code)}
+          keyboardType="numeric"
+        />
+        {errors.fields.code && <ThemedText style={styles.error}>{errors.fields.code.message}</ThemedText>}
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            fetchStatus === 'fetching' && styles.buttonDisabled,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={handleVerify}
+          disabled={fetchStatus === 'fetching'}
+        >
+          <ThemedText style={styles.buttonText}>Verify</ThemedText>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
+          onPress={() => signIn.mfa.sendEmailCode()}
+        >
+          <ThemedText style={styles.secondaryButtonText}>I need a new code</ThemedText>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
+          onPress={() => signIn.reset()}
+        >
+          <ThemedText style={styles.secondaryButtonText}>Start over</ThemedText>
+        </Pressable>
+      </ThemedView>
+    )
+  }
+
   return (
-    <View style={styles.container}>
-      <Text style={[styles.title, { fontSize: 24, fontWeight: 'bold' }]}>
+    <ThemedView style={styles.container}>
+      <ThemedText type="title" style={styles.title}>
         Sign in
-      </Text>
-      <Text style={styles.label}>Email address</Text>
+      </ThemedText>
+
+      <ThemedText style={styles.label}>Email address</ThemedText>
       <TextInput
         style={styles.input}
         autoCapitalize="none"
@@ -63,9 +141,9 @@ export default function Page() {
         keyboardType="email-address"
       />
       {errors.fields.identifier && (
-        <Text style={styles.error}>{errors.fields.identifier.message}</Text>
+        <ThemedText style={styles.error}>{errors.fields.identifier.message}</ThemedText>
       )}
-      <Text style={styles.label}>Password</Text>
+      <ThemedText style={styles.label}>Password</ThemedText>
       <TextInput
         style={styles.input}
         value={password}
@@ -75,7 +153,7 @@ export default function Page() {
         onChangeText={(password) => setPassword(password)}
       />
       {errors.fields.password && (
-        <Text style={styles.error}>{errors.fields.password.message}</Text>
+        <ThemedText style={styles.error}>{errors.fields.password.message}</ThemedText>
       )}
       <Pressable
         style={({ pressed }) => [
@@ -86,18 +164,18 @@ export default function Page() {
         onPress={handleSubmit}
         disabled={!emailAddress || !password || fetchStatus === 'fetching'}
       >
-        <Text style={styles.buttonText}>Continue</Text>
+        <ThemedText style={styles.buttonText}>Continue</ThemedText>
       </Pressable>
       {/* For your debugging purposes. You can just console.log errors, but we put them in the UI for convenience */}
-      {errors && <Text style={styles.debug}>{JSON.stringify(errors, null, 2)}</Text>}
+      {errors && <ThemedText style={styles.debug}>{JSON.stringify(errors, null, 2)}</ThemedText>}
 
       <View style={styles.linkContainer}>
-        <Text>Don't have an account? </Text>
+        <ThemedText>Don't have an account? </ThemedText>
         <Link href="/sign-up">
-          <Text style={{ color: '#0a7ea4' }}>Sign up</Text>
+          <ThemedText type="link">Sign up</ThemedText>
         </Link>
       </View>
-    </View>
+    </ThemedView>
   )
 }
 
@@ -138,6 +216,17 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
+    fontWeight: '600',
+  },
+  secondaryButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  secondaryButtonText: {
+    color: '#0a7ea4',
     fontWeight: '600',
   },
   linkContainer: {
