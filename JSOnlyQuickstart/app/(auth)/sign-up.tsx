@@ -1,39 +1,36 @@
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
-import { useAuth, useSignUp } from '@clerk/expo'
+import { useSignUp } from '@clerk/expo'
 import { type Href, Link, useRouter } from 'expo-router'
 import React from 'react'
 import { Pressable, StyleSheet, TextInput, View } from 'react-native'
 
 export default function Page() {
   const { signUp, errors, fetchStatus } = useSignUp()
-  const { isSignedIn } = useAuth()
   const router = useRouter()
 
-  const [emailAddress, setEmailAddress] = React.useState('')
-  const [password, setPassword] = React.useState('')
+  // For email OTP: collect the email address instead of the phone number
+  const [phoneNumber, setPhoneNumber] = React.useState('')
   const [code, setCode] = React.useState('')
 
   const handleSubmit = async () => {
-    const { error } = await signUp.password({
-      emailAddress,
-      password,
-    })
+    // For email OTP: change create({ phoneNumber }) to create({ emailAddress })
+    const { error } = await signUp.create({ phoneNumber })
     if (error) {
       console.error(JSON.stringify(error, null, 2))
       return
     }
 
-    if (!error) await signUp.verifications.sendEmailCode()
+    // For email OTP: change sendPhoneCode() to sendEmailCode()
+    if (!error) await signUp.verifications.sendPhoneCode()
   }
 
   const handleVerify = async () => {
-    await signUp.verifications.verifyEmailCode({
-      code,
-    })
+    // For email OTP: change verifyPhoneCode() to verifyEmailCode()
+    await signUp.verifications.verifyPhoneCode({ code })
+
     if (signUp.status === 'complete') {
       await signUp.finalize({
-        // Redirect the user to the home page after signing up
         navigate: ({ session, decorateUrl }) => {
           if (session?.currentTask) {
             // Handle pending session tasks
@@ -56,13 +53,14 @@ export default function Page() {
     }
   }
 
-  if (signUp.status === 'complete' || isSignedIn) {
+  if (signUp.status === 'complete') {
     return null
   }
 
   if (
     signUp.status === 'missing_requirements' &&
-    signUp.unverifiedFields.includes('email_address') &&
+    // For email OTP: check for email_address instead of phone_number
+    signUp.unverifiedFields.includes('phone_number') &&
     signUp.missingFields.length === 0
   ) {
     return (
@@ -73,14 +71,12 @@ export default function Page() {
         <TextInput
           style={styles.input}
           value={code}
-          placeholder="Enter your verification code"
+          placeholder="Enter verification code"
           placeholderTextColor="#666666"
           onChangeText={(code) => setCode(code)}
           keyboardType="numeric"
         />
-        {errors.fields.code && (
-          <ThemedText style={styles.error}>{errors.fields.code.message}</ThemedText>
-        )}
+        {errors.fields.code && <ThemedText style={styles.error}>{errors.fields.code.message}</ThemedText>}
         <Pressable
           style={({ pressed }) => [
             styles.button,
@@ -94,7 +90,8 @@ export default function Page() {
         </Pressable>
         <Pressable
           style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
-          onPress={() => signUp.verifications.sendEmailCode()}
+          // For email OTP: change sendPhoneCode() to sendEmailCode()
+          onPress={() => signUp.verifications.sendPhoneCode()}
         >
           <ThemedText style={styles.secondaryButtonText}>I need a new code</ThemedText>
         </Pressable>
@@ -107,42 +104,27 @@ export default function Page() {
       <ThemedText type="title" style={styles.title}>
         Sign up
       </ThemedText>
-
-      <ThemedText style={styles.label}>Email address</ThemedText>
+      <ThemedText style={styles.label}>Phone number</ThemedText>
+      {/* For email OTP: collect the emailAddress instead */}
       <TextInput
         style={styles.input}
-        autoCapitalize="none"
-        value={emailAddress}
-        placeholder="Enter email"
+        value={phoneNumber}
+        placeholder="Enter phone number"
         placeholderTextColor="#666666"
-        onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
-        keyboardType="email-address"
+        onChangeText={(phoneNumber) => setPhoneNumber(phoneNumber)}
+        keyboardType="phone-pad"
       />
-      {errors.fields.emailAddress && (
-        <ThemedText style={styles.error}>{errors.fields.emailAddress.message}</ThemedText>
-      )}
-      <ThemedText style={styles.label}>Password</ThemedText>
-      <TextInput
-        style={styles.input}
-        value={password}
-        placeholder="Enter password"
-        placeholderTextColor="#666666"
-        secureTextEntry={true}
-        onChangeText={(password) => setPassword(password)}
-      />
-      {errors.fields.password && (
-        <ThemedText style={styles.error}>{errors.fields.password.message}</ThemedText>
-      )}
+      {errors.fields.phoneNumber && <ThemedText style={styles.error}>{errors.fields.phoneNumber.message}</ThemedText>}
       <Pressable
         style={({ pressed }) => [
           styles.button,
-          (!emailAddress || !password || fetchStatus === 'fetching') && styles.buttonDisabled,
+          (!phoneNumber || fetchStatus === 'fetching') && styles.buttonDisabled,
           pressed && styles.buttonPressed,
         ]}
         onPress={handleSubmit}
-        disabled={!emailAddress || !password || fetchStatus === 'fetching'}
+        disabled={!phoneNumber || fetchStatus === 'fetching'}
       >
-        <ThemedText style={styles.buttonText}>Sign up</ThemedText>
+        <ThemedText style={styles.buttonText}>Continue</ThemedText>
       </Pressable>
       {/* For your debugging purposes. You can just console.log errors, but we put them in the UI for convenience */}
       {errors && <ThemedText style={styles.debug}>{JSON.stringify(errors, null, 2)}</ThemedText>}
@@ -153,9 +135,6 @@ export default function Page() {
           <ThemedText type="link">Sign in</ThemedText>
         </Link>
       </View>
-
-      {/* Required for sign-up flows. Clerk's bot sign-up protection is enabled by default */}
-      <View nativeID="clerk-captcha" />
     </ThemedView>
   )
 }

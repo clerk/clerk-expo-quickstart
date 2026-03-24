@@ -19,10 +19,12 @@ export default function Page() {
         </Link>
       </Show>
       <Show when="signed-in">
-        <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
+        <Text>Hello {user?.id}</Text>
         <Pressable style={styles.button} onPress={() => signOut()}>
           <Text style={styles.buttonText}>Sign out</Text>
         </Pressable>
+        <Link href="/(account)/manage-mfa">Manage MFA</Link>
+        <Link href="/organization">Organization Management</Link>
       </Show>
     </View>
   )

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@clerk/expo": "^3.0.0-local.v20260227184013",
+    "@clerk/types": "^4.101.21",
     "expo": "54.0.25",
     "expo-auth-session": "~7.0.10",
     "expo-font": "~14.0.11",
@@ -25,6 +26,7 @@
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
     "react-native-gesture-handler": "~2.28.0",
+    "react-native-qr-svg": "^1.5.0",
     "react-native-safe-area-context": "~5.6.2",
     "react-native-screens": "~4.16.0",
     "react-native-web": "^0.21.2"
