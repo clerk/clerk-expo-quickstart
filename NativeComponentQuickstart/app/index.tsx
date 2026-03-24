@@ -3,7 +3,7 @@ import { AuthView, UserButton } from '@clerk/expo/native'
 import { Text, View, StyleSheet, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
 
 export default function MainScreen() {
-  const { isSignedIn, isLoaded } = useAuth()
+  const { isSignedIn, isLoaded } = useAuth({ treatPendingAsSignedOut: false })
   const { user } = useUser()
   const { signOut } = useClerk()
   const { presentUserProfile } = useUserProfileModal()
