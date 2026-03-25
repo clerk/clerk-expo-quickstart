@@ -1,9 +1,36 @@
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
-import { useSignIn } from '@clerk/expo'
+import { useSignIn, useSSO } from '@clerk/expo'
+import type { OAuthStrategy } from '@clerk/shared/types'
 import { type Href, Link, useRouter } from 'expo-router'
 import React from 'react'
-import { Pressable, StyleSheet, TextInput, View } from 'react-native'
+import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native'
+
+function SSOButton({ strategy, label }: { strategy: OAuthStrategy; label: string }) {
+  const { startSSOFlow } = useSSO()
+  const [loading, setLoading] = React.useState(false)
+
+  const handleSSO = async () => {
+    setLoading(true)
+    try {
+      await startSSOFlow({ strategy })
+    } catch (err) {
+      console.error(`[SSO ${strategy}]`, err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <Pressable
+      style={({ pressed }) => [styles.ssoButton, pressed && styles.buttonPressed, loading && styles.buttonDisabled]}
+      onPress={handleSSO}
+      disabled={loading}
+    >
+      {loading ? <ActivityIndicator color="#fff" /> : <ThemedText style={styles.buttonText}>{label}</ThemedText>}
+    </Pressable>
+  )
+}
 
 export default function Page() {
   const { signIn, errors, fetchStatus } = useSignIn()
@@ -169,6 +196,8 @@ export default function Page() {
       {/* For your debugging purposes. You can just console.log errors, but we put them in the UI for convenience */}
       {errors && <ThemedText style={styles.debug}>{JSON.stringify(errors, null, 2)}</ThemedText>}
 
+      <SSOButton strategy="oauth_google" label="Continue with Google" />
+
       <View style={styles.linkContainer}>
         <ThemedText>Don't have an account? </ThemedText>
         <Link href="/sign-up">
@@ -243,6 +272,14 @@ const styles = StyleSheet.create({
   debug: {
     fontSize: 10,
     opacity: 0.5,
+    marginTop: 8,
+  },
+  ssoButton: {
+    backgroundColor: '#4285F4',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
     marginTop: 8,
   },
 })
