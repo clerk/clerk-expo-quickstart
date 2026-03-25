@@ -2,16 +2,16 @@ import CreateOrganization from '@/components/create-org' // See https://clerk.co
 
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
-import { useAuth, useOrganizationList, useUser } from '@clerk/expo'
-import { type Href, useRouter } from 'expo-router'
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { useAuth, useOrganizationList } from '@clerk/expo'
+import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
 // List user's organization memberships
 export const OrganizationSwitcher = () => {
-  const router = useRouter()
-  const { user } = useUser()
   const { isLoaded, setActive, userMemberships } = useOrganizationList({
-    userMemberships: true,
+    userMemberships: {
+      // Set pagination parameters
+      infinite: true,
+    },
   })
   const { orgId } = useAuth()
 
@@ -24,19 +24,20 @@ export const OrganizationSwitcher = () => {
     )
   }
 
-  console.log(user?.organizationMemberships)
-  console.log(userMemberships)
-
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>
-        Joined organizations
-      </ThemedText>
-      {userMemberships?.data?.length > 0 && (
-        <>
-          <ScrollView style={styles.scrollView}>
-            {userMemberships?.data?.map((mem) => (
-              <View key={mem.id} style={styles.card}>
+    <ScrollView>
+      <ThemedView style={styles.container}>
+        <ThemedText type="title" style={styles.title}>
+          Joined organizations
+        </ThemedText>
+
+        {userMemberships?.data && userMemberships.data.length > 0 ? (
+          <FlatList
+            data={userMemberships.data}
+            scrollEnabled={false}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item: mem }) => (
+              <View style={styles.card}>
                 <ThemedText style={styles.label}>Identifier:</ThemedText>
                 <ThemedText style={styles.value}>{mem.publicUserData?.identifier || 'N/A'}</ThemedText>
 
@@ -55,62 +56,34 @@ export const OrganizationSwitcher = () => {
                   ) : (
                     <Pressable
                       style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
-                      onPress={() =>
-                        void setActive?.({
-                          organization: mem.organization.id,
-                          navigate: ({ decorateUrl }) => {
-                            const url = decorateUrl('/organization')
-                            if (url.startsWith('http')) {
-                              window.location.href = url
-                            } else {
-                              router.replace(url as Href)
-                            }
-                          },
-                        })
-                      }
+                      onPress={() => void setActive?.({ organization: mem.organization.id })}
                     >
                       <ThemedText style={styles.buttonText}>Set as active</ThemedText>
                     </Pressable>
                   )}
                 </View>
+                <View style={styles.buttonContainer}>
+                  <Pressable
+                    style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+                    onPress={() => {
+                      mem.destroy()
+                      userMemberships?.revalidate()
+                    }}
+                  >
+                    <ThemedText style={styles.buttonText}>Leave organization</ThemedText>
+                  </Pressable>
+                </View>
               </View>
-            ))}
-          </ScrollView>
-
-          <View style={styles.pagination}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.paginationButton,
-                (!userMemberships?.hasPreviousPage || userMemberships?.isFetching) && styles.buttonDisabled,
-                pressed && styles.buttonPressed,
-              ]}
-              disabled={!userMemberships?.hasPreviousPage || userMemberships?.isFetching}
-              onPress={() => userMemberships?.fetchPrevious?.()}
-            >
-              <ThemedText style={styles.buttonText}>Previous</ThemedText>
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.paginationButton,
-                (!userMemberships?.hasNextPage || userMemberships?.isFetching) && styles.buttonDisabled,
-                pressed && styles.buttonPressed,
-              ]}
-              disabled={!userMemberships?.hasNextPage || userMemberships?.isFetching}
-              onPress={() => userMemberships?.fetchNext?.()}
-            >
-              <ThemedText style={styles.buttonText}>Next</ThemedText>
-            </Pressable>
+            )}
+          />
+        ) : (
+          <View style={styles.emptyContainer}>
+            <ThemedText>No organizations found</ThemedText>
+            <CreateOrganization />
           </View>
-        </>
-      )}
-      {userMemberships?.data?.length === 0 && (
-        <View style={styles.emptyContainer}>
-          <ThemedText>No organizations found</ThemedText>
-          <CreateOrganization />
-        </View>
-      )}
-    </ThemedView>
+        )}
+      </ThemedView>
+    </ScrollView>
   )
 }
 
@@ -127,9 +100,6 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: 20,
-  },
-  scrollView: {
-    flex: 1,
   },
   card: {
     backgroundColor: 'rgba(128, 128, 128, 0.1)',
@@ -159,9 +129,6 @@ const styles = StyleSheet.create({
   buttonPressed: {
     opacity: 0.7,
   },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
   buttonText: {
     color: '#fff',
     fontWeight: '600',
@@ -169,20 +136,6 @@ const styles = StyleSheet.create({
   activeText: {
     color: '#0a7ea4',
     fontWeight: '600',
-  },
-  pagination: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-    gap: 12,
-  },
-  paginationButton: {
-    flex: 1,
-    backgroundColor: '#0a7ea4',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: 'center',
   },
   emptyContainer: {
     flex: 1,

@@ -195,6 +195,7 @@ export default function OrganizationInvitationList() {
       <ThemedText type="title" style={styles.title}>
         Pending Invitations
       </ThemedText>
+      <InviteMember />
       {invitations?.data && invitations.data.length > 0 ? (
         <>
           <ScrollView style={styles.scrollView}>
@@ -295,6 +296,7 @@ const styles = StyleSheet.create({
   },
   selectButtonText: {
     fontSize: 16,
+    color: '#666666',
   },
   button: {
     backgroundColor: '#0a7ea4',
@@ -345,7 +347,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: '#fff',
     borderRadius: 8,
     padding: 20,
     width: '80%',
@@ -359,7 +360,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     marginBottom: 8,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: 'rgba(128, 128, 128, 0.2)',
   },
   roleOptionSelected: {
     backgroundColor: '#0a7ea4',

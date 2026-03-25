@@ -239,11 +239,11 @@ const styles = StyleSheet.create({
   },
   selectButton: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: 'rgba(128, 128, 128, 0.45)',
     borderRadius: 8,
     padding: 12,
-    backgroundColor: '#fff',
     marginBottom: 8,
+    backgroundColor: 'rgba(128, 128, 128, 0.18)',
   },
   selectButtonText: {
     fontSize: 16,
@@ -290,7 +290,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: '#fff',
     borderRadius: 8,
     padding: 20,
     width: '80%',
@@ -304,7 +303,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     marginBottom: 8,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: 'rgba(128, 128, 128, 0.2)',
   },
   roleOptionSelected: {
     backgroundColor: '#0a7ea4',

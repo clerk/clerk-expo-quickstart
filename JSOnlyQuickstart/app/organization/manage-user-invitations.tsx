@@ -1,9 +1,12 @@
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
 import { useOrganizationList } from '@clerk/expo'
+import * as React from 'react'
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
 export default function UserInvitationsList() {
+  const [acceptingId, setAcceptingId] = React.useState<string | null>(null)
+
   const { isLoaded, userInvitations } = useOrganizationList({
     userInvitations: {
       infinite: true,
@@ -40,10 +43,27 @@ export default function UserInvitationsList() {
                 <ThemedText style={styles.value}>{invitation.role}</ThemedText>
 
                 <Pressable
-                  style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
-                  onPress={() => invitation.accept()}
+                  style={({ pressed }) => [
+                    styles.button,
+                    acceptingId === invitation.id && styles.buttonDisabled,
+                    pressed && styles.buttonPressed,
+                  ]}
+                  disabled={acceptingId === invitation.id}
+                  onPress={async () => {
+                    try {
+                      setAcceptingId(invitation.id)
+                      await invitation.accept()
+                      await userInvitations.revalidate()
+                    } catch (err) {
+                      console.error(err)
+                    } finally {
+                      setAcceptingId(null)
+                    }
+                  }}
                 >
-                  <ThemedText style={styles.buttonText}>Accept</ThemedText>
+                  <ThemedText style={styles.buttonText}>
+                    {acceptingId === invitation.id ? 'Accepting…' : 'Accept'}
+                  </ThemedText>
                 </Pressable>
               </View>
             ))}
@@ -52,10 +72,10 @@ export default function UserInvitationsList() {
           <Pressable
             style={({ pressed }) => [
               styles.loadMoreButton,
-              !userInvitations.hasNextPage && styles.buttonDisabled,
+              (!userInvitations.hasNextPage || userInvitations.isFetching) && styles.buttonDisabled,
               pressed && styles.buttonPressed,
             ]}
-            disabled={!userInvitations.hasNextPage}
+            disabled={!userInvitations.hasNextPage || userInvitations.isFetching}
             onPress={() => userInvitations.fetchNext?.()}
           >
             <ThemedText style={styles.buttonText}>Load more</ThemedText>

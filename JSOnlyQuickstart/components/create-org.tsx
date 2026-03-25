@@ -1,13 +1,11 @@
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
 import { useOrganizationList } from '@clerk/expo'
-import { Href, useRouter } from 'expo-router'
 import * as React from 'react'
-import { Platform, Pressable, StyleSheet, TextInput } from 'react-native'
+import { Pressable, StyleSheet, TextInput } from 'react-native'
 
 export default function CreateOrganization() {
   const { createOrganization, setActive } = useOrganizationList()
-  const router = useRouter()
 
   const [organizationName, setOrganizationName] = React.useState('')
   const [isSubmitting, setIsSubmitting] = React.useState(false)
@@ -19,38 +17,19 @@ export default function CreateOrganization() {
       const newOrganization = await createOrganization?.({ name: organizationName })
       // Set the created Organization as the Active Organization
       if (newOrganization) {
-        await setActive?.({
-          organization: newOrganization.id,
-          navigate: ({ decorateUrl }) => {
-            // On native, `decorateUrl` can yield a path that resolves to a nested PUSH to
-            // `index` from inside the org stack and hits the wrong navigator. Use an absolute
-            // replace to `/organization` instead of push.
-            if (Platform.OS === 'web') {
-              const url = decorateUrl('/organization')
-              if (url.startsWith('http')) {
-                window.location.href = url
-                return
-              }
-            }
-            router.replace('/organization' as Href)
-          },
-        })
+        await setActive?.({ organization: newOrganization.id })
         setIsSubmitting(false)
         setCompleted(true)
+        setOrganizationName('')
+        setTimeout(() => {
+          setCompleted(false)
+        }, 3000)
       }
     } catch (err) {
       // See https://clerk.com/docs/guides/development/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2))
     }
-  }
-
-  if (completed) {
-    return (
-      <ThemedView style={styles.container}>
-        <ThemedText style={styles.label}>Organization created</ThemedText>
-      </ThemedView>
-    )
   }
 
   return (
@@ -66,14 +45,15 @@ export default function CreateOrganization() {
       <Pressable
         style={({ pressed }) => [
           styles.button,
-          !organizationName && styles.buttonDisabled,
-          pressed && styles.buttonPressed,
+          completed && styles.buttonSuccess,
+          !organizationName && !completed && styles.buttonDisabled,
+          pressed && !completed && styles.buttonPressed,
         ]}
         onPress={handleSubmit}
-        disabled={!organizationName}
+        disabled={!organizationName || isSubmitting}
       >
         <ThemedText style={styles.buttonText} disabled={isSubmitting}>
-          Create organization
+          {completed ? 'Organization created' : 'Create organization'}
         </ThemedText>
       </Pressable>
     </ThemedView>
@@ -104,6 +84,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
   },
+  buttonSuccess: {
+    backgroundColor: '#2e7d32',
+  },
   buttonPressed: {
     opacity: 0.7,
   },
@@ -113,10 +96,5 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: '600',
-  },
-  warning: {
-    color: '#f57c00',
-    fontSize: 14,
-    marginTop: -4,
   },
 })

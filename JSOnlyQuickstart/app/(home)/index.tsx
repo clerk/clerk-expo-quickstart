@@ -24,6 +24,7 @@ export default function Page() {
           <Text style={styles.buttonText}>Sign out</Text>
         </Pressable>
         <Link href="/(account)/manage-mfa">Manage MFA</Link>
+        <Link href="/(account)/manage-external-accounts">Manage External Accounts</Link>
         <Link href="/organization">Organization Management</Link>
       </Show>
     </View>

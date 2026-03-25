@@ -10,7 +10,7 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@clerk/expo": "^3.0.0-local.v20260227184013",
+    "@clerk/expo": "3.1.5-snapshot.v20260325160806",
     "@clerk/types": "^4.101.21",
     "expo": "54.0.25",
     "expo-auth-session": "~7.0.10",
