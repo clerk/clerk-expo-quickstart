@@ -31,19 +31,13 @@ export default function MainScreen() {
       <View style={styles.profileCard}>
         {user?.imageUrl && <Image source={{ uri: user.imageUrl }} style={styles.avatar} />}
         <View>
-          <Text style={styles.name}>
-            {user?.firstName || 'User'} {user?.lastName || ''}
-          </Text>
-          <Text style={styles.email}>{user?.emailAddresses[0]?.emailAddress}</Text>
+          <Text style={styles.email}>{user?.id}</Text>
         </View>
       </View>
       <TouchableOpacity style={styles.linkButton} onPress={presentUserProfile}>
         <Text style={styles.linkButtonText}>Manage Profile</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.linkButton, { backgroundColor: '#666' }]}
-        onPress={() => signOut()}
-      >
+      <TouchableOpacity style={[styles.linkButton, { backgroundColor: '#666' }]} onPress={() => signOut()}>
         <Text style={styles.linkButtonText}>Sign Out</Text>
       </TouchableOpacity>
     </View>

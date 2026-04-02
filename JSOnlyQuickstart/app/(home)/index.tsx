@@ -19,7 +19,7 @@ export default function Page() {
         </Link>
       </Show>
       <Show when="signed-in">
-        <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
+        <Text>Hello {user?.id}</Text>
         <Pressable style={styles.button} onPress={() => signOut()}>
           <Text style={styles.buttonText}>Sign out</Text>
         </Pressable>
