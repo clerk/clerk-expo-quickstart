@@ -26,13 +26,14 @@ export default function Page() {
     if (signIn.status === 'complete') {
       await signIn.finalize({
         navigate: ({ session, decorateUrl }) => {
+          // Handle session tasks
+          // See https://clerk.com/docs/guides/development/custom-flows/authentication/session-tasks
           if (session?.currentTask) {
-            // Handle pending session tasks
-            // See https://clerk.com/docs/guides/development/custom-flows/authentication/session-tasks
             console.log(session?.currentTask)
             return
           }
 
+          // If no session tasks, navigate the signed-in user to the home page
           const url = decorateUrl('/')
           if (url.startsWith('http')) {
             window.location.href = url
@@ -46,7 +47,9 @@ export default function Page() {
     } else if (signIn.status === 'needs_client_trust') {
       // For other second factor strategies,
       // see https://clerk.com/docs/guides/development/custom-flows/authentication/client-trust
-      const emailCodeFactor = signIn.supportedSecondFactors.find((factor) => factor.strategy === 'email_code')
+      const emailCodeFactor = signIn.supportedSecondFactors.find(
+        (factor) => factor.strategy === 'email_code',
+      )
 
       if (emailCodeFactor) {
         await signIn.mfa.sendEmailCode()
@@ -63,13 +66,14 @@ export default function Page() {
     if (signIn.status === 'complete') {
       await signIn.finalize({
         navigate: ({ session, decorateUrl }) => {
+          // Handle session tasks
+          // See https://clerk.com/docs/guides/development/custom-flows/authentication/session-tasks
           if (session?.currentTask) {
-            // Handle pending session tasks
-            // See https://clerk.com/docs/guides/development/custom-flows/authentication/session-tasks
             console.log(session?.currentTask)
             return
           }
 
+          // If no session tasks, navigate the signed-in user to the home page
           const url = decorateUrl('/')
           if (url.startsWith('http')) {
             window.location.href = url
@@ -87,7 +91,9 @@ export default function Page() {
   if (signIn.status === 'needs_client_trust') {
     return (
       <ThemedView style={styles.container}>
-        <ThemedText type="title" style={[styles.title, { fontSize: 24, fontWeight: 'bold' }]}>Verify your account</ThemedText>
+        <ThemedText type="title" style={[styles.title, { fontSize: 24, fontWeight: 'bold' }]}>
+          Verify your account
+        </ThemedText>
         <TextInput
           style={styles.input}
           value={code}
@@ -96,7 +102,9 @@ export default function Page() {
           onChangeText={(code) => setCode(code)}
           keyboardType="numeric"
         />
-        {errors.fields.code && <ThemedText style={styles.error}>{errors.fields.code.message}</ThemedText>}
+        {errors.fields.code && (
+          <ThemedText style={styles.error}>{errors.fields.code.message}</ThemedText>
+        )}
         <Pressable
           style={({ pressed }) => [
             styles.button,
