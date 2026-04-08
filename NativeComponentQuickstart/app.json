@@ -30,7 +30,12 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      "@clerk/expo",
+      [
+        "@clerk/expo",
+        {
+          "theme": "./clerk-theme.json"
+        }
+      ],
       [
         "expo-splash-screen",
         {
