@@ -74,4 +74,4 @@ Additional environment variables are needed -- see `NativeComponentQuickstart/.e
 
 ## Support
 
-Create a support thread on our [Discord](https://clerk.com/discord) in the `#support` channel.
+[Contact](https://clerk.com/contact/support) or email [support@clerk.com](mailto:support@clerk.com) us for support.
