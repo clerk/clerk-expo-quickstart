@@ -6,7 +6,7 @@ This repository contains three quickstart apps demonstrating different ways to i
 |---|---|---|---|---|
 | [**JS Only**](#js-only) | Custom (React Native) | No | Yes | Yes |
 | [**JS + Native Sign-In**](#js--native-sign-in) | Custom (React Native) | Apple, Google | No | Yes |
-| [**Native Components**](#native-components) | Native (Clerk SDK) | Dashboard-configured | No | Yes |
+| [**Native Components**](#native-components) | Native (Clerk SDK) | Apple, Google | No | Yes |
 
 ## Getting Started
 
