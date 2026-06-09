@@ -6,7 +6,7 @@ This repository contains three quickstart apps demonstrating different ways to i
 |---|---|---|---|---|
 | [**JS Only**](#js-only) | Custom (React Native) | No | Yes | Yes |
 | [**JS + Native Sign-In**](#js--native-sign-in) | Custom (React Native) | Apple, Google | No | Yes |
-| [**Native Components**](#native-components) | Native (Clerk SDK) | Apple, Google | No | Yes |
+| [**Native Components**](#native-components) | Native (Clerk SDK) | Dashboard-configured | No | Yes |
 
 ## Getting Started
 
@@ -22,6 +22,8 @@ pnpm install
 ```
 
 You can find your publishable key in the [Clerk Dashboard](https://dashboard.clerk.com).
+
+These quickstarts currently use the Expo native components snapshot from `https://pkg.pr.new/@clerk/expo@8699`. After the Expo native component changes are released, replace that dependency with the published `@clerk/expo` version.
 
 ## JS Only
 
@@ -55,7 +57,7 @@ Additional environment variables are needed for OAuth -- see `JSWithNativeSignIn
 
 **Directory:** `NativeComponentQuickstart/`
 
-Uses Clerk's native UI components (`AuthView`, `UserProfile`, `UserButton`) from `@clerk/expo/native`. The sign-in/sign-up flow is rendered by the native Clerk SDKs (clerk-ios, clerk-android) and presented modally. The user profile is also a native component.
+Uses Clerk's native UI components (`AuthView`, `UserProfileView`, `UserButton`) from `@clerk/expo/native`. `AuthView` and `UserProfileView` render inline in your React Native hierarchy, so the app owns whether they appear in a route, sheet, or `Modal`. `UserButton` renders the native avatar button and opens the native user profile when tapped.
 
 **Requires a development build.**
 
