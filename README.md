@@ -23,8 +23,6 @@ pnpm install
 
 You can find your publishable key in the [Clerk Dashboard](https://dashboard.clerk.com).
 
-These quickstarts currently use the Expo native components snapshot from `https://pkg.pr.new/@clerk/expo@8699`. After the Expo native component changes are released, replace that dependency with the published `@clerk/expo` version.
-
 ## JS Only
 
 **Directory:** `JSOnlyQuickstart/`

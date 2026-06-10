@@ -10,7 +10,7 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@clerk/expo": "https://pkg.pr.new/@clerk/expo@8699",
+    "@clerk/expo": "3.4.0",
     "expo": "54.0.25",
     "expo-auth-session": "~7.0.10",
     "expo-dev-client": "~6.0.20",
