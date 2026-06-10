@@ -55,7 +55,7 @@ Additional environment variables are needed for OAuth -- see `JSWithNativeSignIn
 
 **Directory:** `NativeComponentQuickstart/`
 
-Uses Clerk's native UI components (`AuthView`, `UserProfile`, `UserButton`) from `@clerk/expo/native`. The sign-in/sign-up flow is rendered by the native Clerk SDKs (clerk-ios, clerk-android) and presented modally. The user profile is also a native component.
+Uses Clerk's native UI components (`AuthView`, `UserProfileView`, `UserButton`) from `@clerk/expo/native`. `AuthView` and `UserProfileView` render inline in your React Native hierarchy, so the app owns whether they appear in a route, sheet, or `Modal`. `UserButton` renders the native avatar button and opens the native user profile when tapped.
 
 **Requires a development build.**
 
