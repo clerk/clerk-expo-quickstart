@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.yourapp"
+      "bundleIdentifier": "com.clerk.tokenbridgetest"
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +18,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.yourcompany.yourapp"
+      "package": "com.clerk.tokenbridgetest"
     },
     "web": {
       "output": "static",

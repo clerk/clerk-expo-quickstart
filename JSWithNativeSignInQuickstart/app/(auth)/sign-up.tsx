@@ -3,14 +3,12 @@ import { ThemedView } from '@/components/themed-view'
 import { GoogleSignInButton } from '@/components/GoogleSignInButton'
 import { AppleSignInButton } from '@/app/components/AppleSignInButton'
 import { useAuth, useSignUp } from '@clerk/expo'
-import { type Href, Link, useRouter } from 'expo-router'
 import React from 'react'
 import { Pressable, StyleSheet, TextInput, View } from 'react-native'
 
 export default function Page() {
   const { signUp, errors, fetchStatus } = useSignUp()
   const { isSignedIn } = useAuth()
-  const router = useRouter()
 
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
@@ -35,20 +33,11 @@ export default function Page() {
     })
     if (signUp.status === 'complete') {
       await signUp.finalize({
-        // Redirect the user to the home page after signing up
-        navigate: ({ session, decorateUrl }) => {
+        navigate: ({ session }) => {
           if (session?.currentTask) {
             // Handle pending session tasks
             // See https://clerk.com/docs/guides/development/custom-flows/authentication/session-tasks
             console.log(session?.currentTask)
-            return
-          }
-
-          const url = decorateUrl('/')
-          if (url.startsWith('http')) {
-            window.location.href = url
-          } else {
-            router.push(url as Href)
           }
         },
       })
@@ -153,13 +142,6 @@ export default function Page() {
       {/* For your debugging purposes. You can just console.log errors, but we put them in the UI for convenience */}
       {errors && <ThemedText style={styles.debug}>{JSON.stringify(errors, null, 2)}</ThemedText>}
 
-      <View style={styles.linkContainer}>
-        <ThemedText>Already have an account? </ThemedText>
-        <Link href="/sign-in">
-          <ThemedText type="link">Sign in</ThemedText>
-        </Link>
-      </View>
-
       {/* Required for sign-up flows. Clerk's bot sign-up protection is enabled by default */}
       <View nativeID="clerk-captcha" />
     </ThemedView>
@@ -215,12 +197,6 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     color: '#0a7ea4',
     fontWeight: '600',
-  },
-  linkContainer: {
-    flexDirection: 'row',
-    gap: 4,
-    marginTop: 12,
-    alignItems: 'center',
   },
   error: {
     color: '#d32f2f',

@@ -1,12 +1,10 @@
 import { useSignInWithApple } from '@clerk/expo/apple'
 import { useSSO } from '@clerk/expo'
-import { useRouter } from 'expo-router'
 import { Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native'
 
 export function AppleSignInButton({ onSignInComplete }: { onSignInComplete?: () => void }) {
   const { startAppleAuthenticationFlow } = useSignInWithApple()
   const { startSSOFlow } = useSSO()
-  const router = useRouter()
 
   const handleAppleSignIn = async () => {
     try {
@@ -16,7 +14,7 @@ export function AppleSignInButton({ onSignInComplete }: { onSignInComplete?: () 
 
         if (createdSessionId && setActive) {
           await setActive({ session: createdSessionId })
-          onSignInComplete?.() ?? router.replace('/')
+          onSignInComplete?.()
         }
       } else {
         // Web-based OAuth Apple Sign-In on Android
@@ -26,7 +24,7 @@ export function AppleSignInButton({ onSignInComplete }: { onSignInComplete?: () 
 
         if (createdSessionId && setActive) {
           await setActive({ session: createdSessionId })
-          onSignInComplete?.() ?? router.replace('/')
+          onSignInComplete?.()
         }
       }
     } catch (err: any) {

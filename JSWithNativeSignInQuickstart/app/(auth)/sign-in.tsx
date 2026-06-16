@@ -1,19 +1,34 @@
 import { ThemedText } from '@/components/themed-text'
-import { ThemedView } from '@/components/themed-view'
 import { GoogleSignInButton } from '@/components/GoogleSignInButton'
 import { AppleSignInButton } from '@/app/components/AppleSignInButton'
 import { useSignIn } from '@clerk/expo'
-import { type Href, Link, useRouter } from 'expo-router'
 import React from 'react'
-import { Pressable, StyleSheet, TextInput, View } from 'react-native'
+import { ActivityIndicator, Button, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native'
 
-export default function Page() {
+type PageProps = {
+  onPresentNativeAuth?: () => void
+}
+
+export default function Page({ onPresentNativeAuth }: PageProps) {
   const { signIn, errors, fetchStatus } = useSignIn()
-  const router = useRouter()
 
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [code, setCode] = React.useState('')
+  const isSubmitting = fetchStatus === 'fetching'
+
+  const finalizeSignIn = React.useCallback(async () => {
+    return signIn.finalize({
+      navigate: ({ session }) => {
+        if (session?.currentTask) {
+          // Handle pending session tasks
+          // See https://clerk.com/docs/guides/development/custom-flows/authentication/session-tasks
+          console.log(session?.currentTask)
+          return
+        }
+      },
+    })
+  }, [signIn])
 
   const handleSubmit = async () => {
     const { error } = await signIn.password({
@@ -25,70 +40,23 @@ export default function Page() {
       return
     }
 
-    if (signIn.status === 'complete') {
-      await signIn.finalize({
-        navigate: ({ session, decorateUrl }) => {
-          if (session?.currentTask) {
-            // Handle pending session tasks
-            // See https://clerk.com/docs/guides/development/custom-flows/authentication/session-tasks
-            console.log(session?.currentTask)
-            return
-          }
-
-          const url = decorateUrl('/')
-          if (url.startsWith('http')) {
-            window.location.href = url
-          } else {
-            router.push(url as Href)
-          }
-        },
-      })
-    } else if (signIn.status === 'needs_second_factor') {
-      // See https://clerk.com/docs/guides/development/custom-flows/authentication/multi-factor-authentication
-    } else if (signIn.status === 'needs_client_trust') {
-      // For other second factor strategies,
-      // see https://clerk.com/docs/guides/development/custom-flows/authentication/client-trust
-      const emailCodeFactor = signIn.supportedSecondFactors.find((factor) => factor.strategy === 'email_code')
-
-      if (emailCodeFactor) {
-        await signIn.mfa.sendEmailCode()
-      }
-    } else {
-      // Check why the sign-in is not complete
-      console.error('Sign-in attempt not complete:', signIn)
-    }
+    await finalizeSignIn()
   }
 
   const handleVerify = async () => {
-    await signIn.mfa.verifyEmailCode({ code })
+    const { error } = await signIn.mfa.verifyEmailCode({ code })
 
-    if (signIn.status === 'complete') {
-      await signIn.finalize({
-        navigate: ({ session, decorateUrl }) => {
-          if (session?.currentTask) {
-            // Handle pending session tasks
-            // See https://clerk.com/docs/guides/development/custom-flows/authentication/session-tasks
-            console.log(session?.currentTask)
-            return
-          }
-
-          const url = decorateUrl('/')
-          if (url.startsWith('http')) {
-            window.location.href = url
-          } else {
-            router.push(url as Href)
-          }
-        },
-      })
-    } else {
-      // Check why the sign-in is not complete
-      console.error('Sign-in attempt not complete:', signIn)
+    if (error) {
+      console.error(JSON.stringify(error, null, 2))
+      return
     }
+
+    await finalizeSignIn()
   }
 
   if (signIn.status === 'needs_client_trust') {
     return (
-      <View style={styles.container}>
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.container}>
         <ThemedText type="title" style={[styles.title, { fontSize: 24, fontWeight: 'bold' }]}>Verify your account</ThemedText>
         <TextInput
           style={styles.input}
@@ -99,17 +67,7 @@ export default function Page() {
           keyboardType="numeric"
         />
         {errors.fields.code && <ThemedText style={styles.error}>{errors.fields.code.message}</ThemedText>}
-        <Pressable
-          style={({ pressed }) => [
-            styles.button,
-            fetchStatus === 'fetching' && styles.buttonDisabled,
-            pressed && styles.buttonPressed,
-          ]}
-          onPress={handleVerify}
-          disabled={fetchStatus === 'fetching'}
-        >
-          <ThemedText style={styles.buttonText}>Verify</ThemedText>
-        </Pressable>
+        <Button title="Verify" onPress={handleVerify} disabled={fetchStatus === 'fetching'} />
         <Pressable
           style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
           onPress={() => signIn.mfa.sendEmailCode()}
@@ -122,18 +80,28 @@ export default function Page() {
         >
           <ThemedText style={styles.secondaryButtonText}>Start over</ThemedText>
         </Pressable>
-      </View>
+      </ScrollView>
     )
   }
 
   return (
-    <ThemedView style={styles.container}>
+    <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.container}>
       <ThemedText type="title" style={styles.title}>
         Sign in
       </ThemedText>
 
       <AppleSignInButton />
       <GoogleSignInButton />
+      {onPresentNativeAuth && (
+        <Pressable
+          accessibilityLabel="Open native AuthView"
+          accessibilityRole="button"
+          style={({ pressed }) => [styles.nativeAuthButton, pressed && styles.buttonPressed]}
+          onPress={onPresentNativeAuth}
+        >
+          <ThemedText style={styles.nativeAuthButtonText}>Open native AuthView</ThemedText>
+        </Pressable>
+      )}
 
       <ThemedText style={styles.label}>Email address</ThemedText>
       <TextInput
@@ -154,6 +122,8 @@ export default function Page() {
         value={password}
         placeholder="Enter password"
         placeholderTextColor="#666666"
+        autoComplete="off"
+        textContentType="none"
         secureTextEntry={true}
         onChangeText={(password) => setPassword(password)}
       />
@@ -161,33 +131,31 @@ export default function Page() {
         <ThemedText style={styles.error}>{errors.fields.password.message}</ThemedText>
       )}
       <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ disabled: !emailAddress || !password || isSubmitting, busy: isSubmitting }}
+        onPress={handleSubmit}
+        disabled={!emailAddress || !password || isSubmitting}
         style={({ pressed }) => [
           styles.button,
-          (!emailAddress || !password || fetchStatus === 'fetching') && styles.buttonDisabled,
+          (!emailAddress || !password || isSubmitting) && styles.buttonDisabled,
           pressed && styles.buttonPressed,
         ]}
-        onPress={handleSubmit}
-        disabled={!emailAddress || !password || fetchStatus === 'fetching'}
       >
-        <ThemedText style={styles.buttonText}>Continue</ThemedText>
+        {isSubmitting && <ActivityIndicator color="#fff" size="small" />}
+        <ThemedText style={styles.buttonText}>{isSubmitting ? 'Signing in...' : 'Continue'}</ThemedText>
       </Pressable>
       {/* For your debugging purposes. You can just console.log errors, but we put them in the UI for convenience */}
       {errors && <ThemedText style={styles.debug}>{JSON.stringify(errors, null, 2)}</ThemedText>}
 
-      <View style={styles.linkContainer}>
-        <ThemedText>Don't have an account? </ThemedText>
-        <Link href="/sign-up">
-          <ThemedText type="link">Sign up</ThemedText>
-        </Link>
-      </View>
-    </ThemedView>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 20,
+    paddingBottom: 48,
     gap: 12,
   },
   title: {
@@ -211,6 +179,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 8,
     alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'center',
     marginTop: 8,
   },
   buttonPressed: {
@@ -223,6 +194,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
   },
+  nativeAuthButton: {
+    borderWidth: 1,
+    borderColor: '#0a7ea4',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  nativeAuthButtonText: {
+    color: '#0a7ea4',
+    fontWeight: '600',
+  },
   secondaryButton: {
     paddingVertical: 12,
     paddingHorizontal: 24,
@@ -233,12 +216,6 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     color: '#0a7ea4',
     fontWeight: '600',
-  },
-  linkContainer: {
-    flexDirection: 'row',
-    gap: 4,
-    marginTop: 12,
-    alignItems: 'center',
   },
   error: {
     color: '#d32f2f',

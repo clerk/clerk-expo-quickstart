@@ -1,5 +1,4 @@
 import { useSignInWithGoogle } from '@clerk/expo/google'
-import { useRouter } from 'expo-router'
 import { Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 interface GoogleSignInButtonProps {
@@ -12,7 +11,6 @@ export function GoogleSignInButton({
   showDivider = true,
 }: GoogleSignInButtonProps) {
   const { startGoogleAuthenticationFlow } = useSignInWithGoogle()
-  const router = useRouter()
 
   // Only render on iOS and Android
   if (Platform.OS !== 'ios' && Platform.OS !== 'android') {
@@ -34,12 +32,7 @@ export function GoogleSignInButton({
 
       if (createdSessionId && setActive) {
         await setActive({ session: createdSessionId })
-
-        if (onSignInComplete) {
-          onSignInComplete()
-        } else {
-          router.replace('/')
-        }
+        onSignInComplete?.()
       } else {
         console.warn('[GoogleSignIn] No createdSessionId returned. Full result:', JSON.stringify(result, null, 2))
       }
