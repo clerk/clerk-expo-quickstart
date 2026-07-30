@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.29.7",
-    "@clerk/expo": "file:/tmp/clerk-expo-pack/clerk-expo-3.4.3.tgz",
+    "@clerk/expo": "file:/tmp/clerk-expo-pack/clerk-expo-3.4.4.tgz",
     "expo": "54.0.25",
     "expo-apple-authentication": "~8.0.8",
     "expo-auth-session": "~7.0.11",

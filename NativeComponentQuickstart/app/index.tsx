@@ -1,12 +1,14 @@
 import { isClerkAPIResponseError, useAuth, useSignIn, useUser } from '@clerk/expo'
 import { AuthView, UserButton, UserProfileView } from '@clerk/expo/native'
-import { useRouter } from 'expo-router'
+import { Stack, useRouter } from 'expo-router'
 import { useState } from 'react'
 import {
   ActivityIndicator,
   Button,
   Image,
   Modal,
+  Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -30,6 +32,9 @@ const palette = {
 }
 
 const password = 'ClerkPass1234'
+
+const signedInHeaderOptions = { headerRight: () => <UserButton /> }
+const signedOutHeaderOptions = { headerRight: undefined }
 
 export default function MainScreen() {
   const { isSignedIn, isLoaded, signOut } = useAuth({ treatPendingAsSignedOut: false })
@@ -73,64 +78,98 @@ export default function MainScreen() {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.foreground }]}>Welcome</Text>
-        {isSignedIn && <UserButton />}
-      </View>
+    <ScrollView
+      contentInsetAdjustmentBehavior="automatic"
+      style={{ backgroundColor: colors.background }}
+      contentContainerStyle={styles.container}
+    >
+      <Stack.Screen options={isSignedIn ? signedInHeaderOptions : signedOutHeaderOptions} />
 
       {isSignedIn ? (
         <>
           <View style={[styles.profileCard, { backgroundColor: colors.card }]}>
             {user?.imageUrl && <Image source={{ uri: user.imageUrl }} style={styles.avatar} />}
             <View style={styles.profileText}>
-              <Text style={[styles.fullName, { color: colors.foreground }]}>
-                {user?.fullName ?? 'No full name'}
-              </Text>
+              <View style={styles.profileHeading}>
+                <Text style={[styles.fullName, { color: colors.foreground }]}>
+                  {user?.fullName ?? 'No full name'}
+                </Text>
+                <Pressable accessibilityRole="button" hitSlop={8} onPress={() => void signOut()}>
+                  <Text style={styles.signOut}>Sign out</Text>
+                </Pressable>
+              </View>
               <Text style={[styles.username, { color: colors.foreground }]}>
                 Username: {user?.username || 'No username'}
               </Text>
-              <Text style={[styles.email, { color: colors.mutedForeground }]}>
+              <Text
+                ellipsizeMode="middle"
+                numberOfLines={1}
+                style={[styles.email, { color: colors.mutedForeground }]}
+              >
                 {user?.primaryEmailAddress?.emailAddress ?? user?.id}
               </Text>
-              <Button title="Sign out" onPress={() => void signOut()} />
             </View>
           </View>
 
-          <View style={[styles.signInCard, { backgroundColor: colors.card }]}>
+          <View style={[styles.card, { backgroundColor: colors.card }]}>
             <Text style={[styles.fullName, { color: colors.foreground }]}>UserProfileView flavors</Text>
-            <Button title="1. Classic (own modal, Clerk header)" onPress={() => setIsProfileOpen(true)} />
-            <Button title="2. UserProfileScreen (router header)" onPress={() => router.push('/account')} />
-            <Button title="3. hideHeader (custom app header)" onPress={() => router.push('/custom-profile')} />
+            <View style={styles.flavorButton}>
+              <Button title="1. Modal" onPress={() => setIsProfileOpen(true)} />
+            </View>
+            <View style={styles.flavorButton}>
+              <Button title="2. Pushed route" onPress={() => router.push('/account')} />
+            </View>
+            <View style={styles.flavorButton}>
+              <Button title="3. Settings sheet" onPress={() => router.push('/settings-sheet')} />
+            </View>
           </View>
         </>
       ) : (
-        <View style={[styles.signInCard, { backgroundColor: colors.card }]}>
-          <Button title="Native AuthView sign in (modal)" onPress={() => setIsAuthOpen(true)} />
-          <Button title="AuthScreen sign in (router header)" onPress={() => router.push('/sign-in')} />
-          <TextInput
-            autoCapitalize="none"
-            autoComplete="email"
-            keyboardType="email-address"
-            onChangeText={setEmailAddress}
-            placeholder="Email"
-            placeholderTextColor={colors.mutedForeground}
-            style={[styles.input, { borderColor: colors.mutedForeground, color: colors.foreground }]}
-            value={emailAddress}
-          />
-          <TextInput
-            autoCapitalize="none"
-            autoComplete="password"
-            editable={false}
-            placeholder="Password"
-            placeholderTextColor={colors.mutedForeground}
-            secureTextEntry
-            style={[styles.input, { borderColor: colors.mutedForeground, color: colors.foreground }]}
-            value={password}
-          />
-          {jsError && <Text style={styles.error}>{jsError}</Text>}
-          <Button title="JS email/password sign in" onPress={onJsSignIn} disabled={isSubmitting} />
-        </View>
+        <>
+          <View style={[styles.card, { backgroundColor: colors.card }]}>
+            <Text style={[styles.fullName, { color: colors.foreground }]}>AuthView flavors</Text>
+            <View style={styles.flavorButton}>
+              <Button title="1. Modal" onPress={() => setIsAuthOpen(true)} />
+            </View>
+            <View style={styles.flavorButton}>
+              <Button title="2. Pushed route" onPress={() => router.push('/sign-in')} />
+            </View>
+            <View style={styles.flavorButton}>
+              <Button title="3. Pushed 3 deep" onPress={() => router.push('/intermediate')} />
+            </View>
+            <View style={styles.flavorButton}>
+              <Button title="4. Settings sheet" onPress={() => router.push('/settings-sheet')} />
+            </View>
+          </View>
+
+          <View style={[styles.card, { backgroundColor: colors.card }]}>
+            <Text style={[styles.fullName, { color: colors.foreground }]}>JS sign-in</Text>
+            <TextInput
+              autoCapitalize="none"
+              autoComplete="email"
+              keyboardType="email-address"
+              onChangeText={setEmailAddress}
+              placeholder="Email"
+              placeholderTextColor={colors.mutedForeground}
+              style={[styles.input, { borderColor: colors.mutedForeground, color: colors.foreground }]}
+              value={emailAddress}
+            />
+            <TextInput
+              autoCapitalize="none"
+              autoComplete="password"
+              editable={false}
+              placeholder="Password"
+              placeholderTextColor={colors.mutedForeground}
+              secureTextEntry
+              style={[styles.input, { borderColor: colors.mutedForeground, color: colors.foreground }]}
+              value={password}
+            />
+            {jsError && <Text style={styles.error}>{jsError}</Text>}
+            <View style={styles.flavorButton}>
+              <Button title="Sign in" onPress={onJsSignIn} disabled={isSubmitting} />
+            </View>
+          </View>
+        </>
       )}
 
       <Modal
@@ -151,7 +190,7 @@ export default function MainScreen() {
       >
         <UserProfileView onDismiss={() => setIsProfileOpen(false)} />
       </Modal>
-    </View>
+    </ScrollView>
   )
 }
 
@@ -163,19 +202,8 @@ const styles = StyleSheet.create({
     padding: 40,
   },
   container: {
-    flex: 1,
     padding: 20,
-    paddingTop: 60,
     gap: 16,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
   },
   profileCard: {
     flexDirection: 'row',
@@ -184,7 +212,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     gap: 12,
   },
-  signInCard: {
+  card: {
     padding: 16,
     borderRadius: 12,
     gap: 12,
@@ -200,6 +228,9 @@ const styles = StyleSheet.create({
     color: '#DC2626',
     fontSize: 14,
   },
+  flavorButton: {
+    alignSelf: 'flex-start',
+  },
   avatar: {
     width: 48,
     height: 48,
@@ -207,7 +238,18 @@ const styles = StyleSheet.create({
   },
   profileText: {
     flex: 1,
-    gap: 8,
+    gap: 4,
+  },
+  profileHeading: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 12,
+    justifyContent: 'space-between',
+  },
+  signOut: {
+    color: '#007AFF',
+    fontSize: 15,
+    fontWeight: '500',
   },
   email: {
     fontSize: 14,

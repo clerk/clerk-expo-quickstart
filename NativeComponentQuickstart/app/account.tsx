@@ -1,8 +1,19 @@
-import { UserProfileScreen } from '@clerk/expo/native/router'
+import { UserProfileView } from '@clerk/expo/native'
+import { Stack, useRouter } from 'expo-router'
 
-// Flavor 2: drop-in expo-router screen. The route header is the only header;
-// its back button, gestures, and Android hardware back drive Clerk's internal
-// screens, and the route pops itself on sign-out or account deletion.
+// The profile pushed as a route: hide this route's header and Clerk's own chrome
+// takes over. Sign-out ends the flow, so leave the route when it does.
 export default function AccountRoute() {
-  return <UserProfileScreen options={{ title: 'Account' }} />
+  const router = useRouter()
+
+  return (
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+      <UserProfileView
+        isDismissible={false}
+        onHostBack={() => router.back()}
+        style={{ flex: 1 }}
+      />
+    </>
+  )
 }

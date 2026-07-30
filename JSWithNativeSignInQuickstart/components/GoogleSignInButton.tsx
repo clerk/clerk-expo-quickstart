@@ -48,7 +48,12 @@ export function GoogleSignInButton({
 
   return (
     <>
-      <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn}>
+      <TouchableOpacity
+        accessibilityLabel="Sign in with Google"
+        accessibilityRole="button"
+        style={styles.googleButton}
+        onPress={handleGoogleSignIn}
+      >
         <Text style={styles.googleButtonText}>Sign in with Google</Text>
       </TouchableOpacity>
 
