@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@clerk/expo':
-        specifier: file:/tmp/clerk-expo-pack-current/clerk-expo-embedded-nav.tgz
-        version: file:../../../../../../tmp/clerk-expo-pack-current/clerk-expo-embedded-nav.tgz(zz7ztb546evyjssz3smpovyuoq)
+        specifier: file:/tmp/clerk-expo-pack-current/clerk-expo-embedded-nav-3.tgz
+        version: file:../../../../../../tmp/clerk-expo-pack-current/clerk-expo-embedded-nav-3.tgz(zz7ztb546evyjssz3smpovyuoq)
       '@expo/metro-runtime':
         specifier: ~6.1.2
         version: 6.1.2(expo@54.0.35)(react-dom@19.1.0(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.7)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@6.0.6))(react@19.1.0)
@@ -599,8 +599,8 @@ packages:
     resolution: {integrity: sha512-N91mFKenMF5e+LRQ0NsqFb8bw+icbwnF8MzjzS4cux72xG4Gekh772tiLIetbURe44Srgjw5lj8jkWbt+yH/FA==}
     engines: {node: '>=20.9.0'}
 
-  '@clerk/expo@file:../../../../../../tmp/clerk-expo-pack-current/clerk-expo-embedded-nav.tgz':
-    resolution: {integrity: sha512-wUxHzvrVPE58AQuFlXbtLy53EbDionWVOAToKtN7Jgv5R8HrSq4xQaFKa7Dp4OqUb+oMFF99c8X/hbur/6w23w==, tarball: file:../../../../../../tmp/clerk-expo-pack-current/clerk-expo-embedded-nav.tgz}
+  '@clerk/expo@file:../../../../../../tmp/clerk-expo-pack-current/clerk-expo-embedded-nav-3.tgz':
+    resolution: {integrity: sha512-PHewXaJp39OWP1pYSP9rKmvOXTPayw+1WQPJHWqjnVT4+YDrmMjXjp4x/syllZ7LTU7hKDetxRXZO4kVfqRNaA==, tarball: file:../../../../../../tmp/clerk-expo-pack-current/clerk-expo-embedded-nav-3.tgz}
     version: 4.1.2
     engines: {node: '>=20.9.0'}
     peerDependencies:
@@ -4909,7 +4909,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@clerk/expo@file:../../../../../../tmp/clerk-expo-pack-current/clerk-expo-embedded-nav.tgz(zz7ztb546evyjssz3smpovyuoq)':
+  '@clerk/expo@file:../../../../../../tmp/clerk-expo-pack-current/clerk-expo-embedded-nav-3.tgz(zz7ztb546evyjssz3smpovyuoq)':
     dependencies:
       '@clerk/clerk-js': 6.25.12(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(@types/react@19.1.17)(bs58@6.0.0)(bufferutil@4.1.0)(react-dom@19.1.0(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.7)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@6.0.6))(react@19.1.0)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.1.0))(utf-8-validate@6.0.6)
       '@clerk/react': 6.12.9(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -5798,7 +5798,7 @@ snapshots:
 
   '@scure/bip32@1.7.0':
     dependencies:
-      '@noble/curves': 1.9.1
+      '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
 
@@ -6517,7 +6517,7 @@ snapshots:
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 12.20.55
+      '@types/node': 26.1.2
 
   '@types/graceful-fs@4.1.9':
     dependencies:
@@ -6551,7 +6551,7 @@ snapshots:
 
   '@types/ws@7.4.7':
     dependencies:
-      '@types/node': 12.20.55
+      '@types/node': 26.1.2
 
   '@types/ws@8.18.1':
     dependencies:
@@ -8358,7 +8358,7 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.2.3(typescript@5.9.3)
+      abitype: 1.3.0(typescript@5.9.3)
       eventemitter3: 5.0.1
     optionalDependencies:
       typescript: 5.9.3

@@ -10,7 +10,7 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@clerk/expo": "file:/tmp/clerk-expo-pack-current/clerk-expo-embedded-nav.tgz",
+    "@clerk/expo": "file:/tmp/clerk-expo-pack-current/clerk-expo-embedded-nav-3.tgz",
     "@expo/metro-runtime": "~6.1.2",
     "expo": "54.0.35",
     "expo-auth-session": "~7.0.10",
