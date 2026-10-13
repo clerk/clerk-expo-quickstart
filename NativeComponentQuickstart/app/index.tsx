@@ -1,5 +1,5 @@
 import { useAuth, useUser } from '@clerk/expo'
-import { AuthView, UserButton } from '@clerk/expo/native'
+import { AuthView, UserButton } from '@clerk/expo/native-components'
 import { useState } from 'react'
 import {
   ActivityIndicator,
